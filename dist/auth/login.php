@@ -3,6 +3,7 @@
   <!--begin::Head-->
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <img src="../assets/img/bcf.png" style="width:120px; margin-bottom:10px;">
     <title>Admin Login</title>
     <!--begin::Accessibility Meta Tags-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
@@ -54,18 +55,66 @@
     <!--begin::Required Plugin(AdminLTE)-->
     <link rel="stylesheet" href="../css/adminlte.css" />
     <!--end::Required Plugin(AdminLTE)-->
+
+    <style>
+  body.login-page {
+    background: url('../assets/img/bg.png') no-repeat center center fixed;
+    background-size: cover;
+    position: relative;
+    
+  }
+
+  /* Dark overlay */
+  body.login-page::before {
+      background: linear-gradient(
+    rgba(0,0,0,0.5),
+    rgba(0,0,0,0.6)
+  );
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 0;
+  }
+
+  .login-box {
+    position: relative;
+    z-index: 1;
+  }
+
+  .login-logo {
+    display: none; /* remove "Login Form" text */
+  }
+
+  .card {
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+  }
+  .btn-primary {
+  border-radius: 8px;
+  font-weight: 600;
+}
+</style>
+
   </head>
   <!--end::Head-->
   <!--begin::Body-->
   <body class="login-page bg-body-secondary">
     <div class="login-box">
+      
       <div class="login-logo">
-        <a href="login.php"><b>Login</b> Form</a>
       </div>
       <!-- /.login-logo -->
       <div class="card">
         <div class="card-body login-card-body">
-          <p class="login-box-msg">Sign in to start your session</p>
+          <p class="login-box-msg text-center fw-bold" style="font-size:18px;">
+        BCF Admin Dashboard
+      </p>
           <form id="loginForm">
             <div class="input-group mb-3">
               <input type="email" id="email" class="form-control" placeholder="Email" require/>
