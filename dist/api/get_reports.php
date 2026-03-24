@@ -13,7 +13,13 @@ if (!isset($_SESSION['user'])) {
     exit;
 }
 
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 $config = require __DIR__ . '/../auth/config.php';
+
+var_dump($config);
+exit;
 
 $apiKey = $config['TRELLO']['API_KEY'];
 $token = $config['TRELLO']['TOKEN'];
