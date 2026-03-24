@@ -1,11 +1,4 @@
 <?php
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
-$config = require __DIR__ . '/../auth/config.php';
-
-var_dump($config);
-exit;
 
 session_start();
 header("Content-Type: application/json");
@@ -21,6 +14,7 @@ if (!isset($_SESSION['user'])) {
     exit;
 }
 
+$config = require __DIR__ . '/../auth/config.php';
 
 
 $apiKey = $config['TRELLO']['API_KEY'];
