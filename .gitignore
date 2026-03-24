@@ -22,8 +22,6 @@ nbproject/private
 .vs/
 
 # Hide config files
-dist/auth/config.php
-
 # Hide all env/config variants
 *.env
 *.ini
