@@ -3,7 +3,6 @@
   <!--begin::Head-->
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <img src="../assets/img/bcf.png" style="width:120px; margin-bottom:10px;">
     <title>Admin Login</title>
     <!--begin::Accessibility Meta Tags-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
@@ -12,7 +11,7 @@
     <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
     <!--end::Accessibility Meta Tags-->
     <!--begin::Primary Meta Tags-->
-    <meta name="title" content="AdminLTE 4 | Login Page" />
+    <meta name="title" content="CEO Dashboard | Login Page" />
     <meta name="author" content="ColorlibHQ" />
     <meta
       name="description"
@@ -104,7 +103,8 @@
   </head>
   <!--end::Head-->
   <!--begin::Body-->
-  <body class="login-page bg-body-secondary">
+  <body class="login-page bg-body-secondary">   
+     <img src="../assets/img/bcf.png" style="width:120px; margin-bottom:10px;">
     <div class="login-box">
       
       <div class="login-logo">
@@ -113,7 +113,7 @@
       <div class="card">
         <div class="card-body login-card-body">
           <p class="login-box-msg text-center fw-bold" style="font-size:18px;">
-        BCF Admin Dashboard
+        Login Form
       </p>
           <form id="loginForm">
             <div class="input-group mb-3">

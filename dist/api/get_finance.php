@@ -12,8 +12,12 @@ if (!isset($_SESSION['user'])) {
 }
 $config = require __DIR__ . '/../auth/config.php';
 
-$apiKey = $config['GHL']['API_KEY'];
-$locationId = $config['GHL']['LOCATION_ID'];
+$accounts = $config['ACCOUNTS'];
+
+$selectedAccount = $_SESSION['account'] ?? 'bcf';
+
+$apiKey = $accounts[$selectedAccount]['GHL']['API_KEY'];
+$locationId = $accounts[$selectedAccount]['GHL']['LOCATION_ID'];
 
 $headers = [
     "Authorization: Bearer $apiKey",

@@ -98,14 +98,14 @@
                 />
                 <span class="d-none d-md-inline">Nicola Graham</span>
               </a>
-              <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-
-                <li class="user-footer">
-                  <a href="#" class="btn btn-default btn-flat">Profile</a>
-                  <a href="./api/logout.php" class="btn btn-default btn-flat float-end">Sign out</a>
-                </li>
-                <!--end::Menu Footer-->
-              </ul>
+              <ul class="dropdown-menu dropdown-menu-end p-2" style="min-width: 180px;">
+              <li>
+                <a href="./api/logout.php" class="dropdown-item text-danger d-flex align-items-center">
+                  <i class="bi bi-box-arrow-right me-2"></i>
+                  Sign out
+                </a>
+              </li>
+            </ul>
             </li>
             <!--end::User Menu Dropdown-->
           </ul>
@@ -121,14 +121,11 @@
           <!--begin::Brand Link-->
           <a href="./index.html" class="brand-link">
             <!--begin::Brand Image-->
-            <img
-              src="./assets/img/bcf.png"
-              alt="BCF Logo"
-              class="brand-image opacity-75 shadow"
-            />
+            <img id="accountLogo" src="./assets/img/bcf.png" alt="Logo" class="brand-image">
             <!--end::Brand Image-->
             <!--begin::Brand Text-->
-            <span class="brand-text fw-light">Admin</span>
+            <span id="accountName" class="brand-text fw-light">BCF</span>
+            
             <!--end::Brand Text-->
           </a>
           <!--end::Brand Link-->
@@ -378,16 +375,17 @@
       <!--end::App Main-->
       <!--begin::Footer-->
       <footer class="app-footer">
-        <!--begin::To the end-->
-        <div class="float-end d-none d-sm-inline">Anything you want</div>
-        <!--end::To the end-->
-        <!--begin::Copyright-->
+        <!-- Right side -->
+        <div class="float-end d-none d-sm-inline">
+          v1.0
+        </div>
+
+        <!-- Left side -->
         <strong>
-          Footer -- -- &nbsp;
-          <a href="https://adminlte.io" class="text-decoration-none">BalleyCastleTestUI</a>.
+          © <?php echo date('Y'); ?>
+          <a href="#" class="text-decoration-none">Ballycastle Admin Dashboard</a>.
         </strong>
         All rights reserved.
-        <!--end::Copyright-->
       </footer>
       <!--end::Footer-->
     </div>
@@ -412,26 +410,6 @@
     <script src="./js/adminlte.js"></script>
     <!--end::Required Plugin(AdminLTE)--><!--begin::OverlayScrollbars Configure-->
     
-    <script>
-      const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
-      const Default = {
-        scrollbarTheme: 'os-theme-light',
-        scrollbarAutoHide: 'leave',
-        scrollbarClickScroll: true,
-      };
-      document.addEventListener('DOMContentLoaded', function () {
-        const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
-        if (sidebarWrapper && OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined) {
-          OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
-            scrollbars: {
-              theme: Default.scrollbarTheme,
-              autoHide: Default.scrollbarAutoHide,
-              clickScroll: Default.scrollbarClickScroll,
-            },
-          });
-        }
-      });
-    </script>
     <!--end::OverlayScrollbars Configure-->
     <!-- OPTIONAL SCRIPTS -->
     <!-- sortablejs -->
@@ -440,28 +418,34 @@
       crossorigin="anonymous"
     ></script>
     <!-- sortablejs -->
-    
 
-    <script>
-      new Sortable(document.querySelector('.connectedSortable'), {
-        group: 'shared',
-        handle: '.card-header',
-      });
-
-      const cardHeaders = document.querySelectorAll('.connectedSortable .card-header');
-      cardHeaders.forEach((cardHeader) => {
-        cardHeader.style.cursor = 'move';
-      });
-    </script>
     <!-- apexcharts -->
     <script
       src="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.min.js"
       integrity="sha256-+vh8GkaU7C9/wbSLIcwq82tQ2wTf44aOHA8HlBMwRI8="
       crossorigin="anonymous"
     ></script>
+    <script src="./js/account_ui.js"></script>
     <!-- ChartJS -->
     <!-- jsvectormap -->
     <script>
+// ==============================
+// 🔥 MAIN REFRESH FUNCTION
+// ==============================
+function refreshPageData() {
+  loadFinanceData();
+}
+
+// ==============================
+// ✅ ACCOUNT HELPER
+// ==============================
+function getAccount() {
+  return localStorage.getItem('account') || 'bcf';
+}
+
+// ==============================
+// 📊 FINANCE LOGIC
+// ==============================
 let chartCashflow, chartRevenue;
 let isLoading = false;
 
@@ -470,26 +454,25 @@ async function loadFinanceData() {
   isLoading = true;
 
   try {
-    const res = await fetch('api/get_finance.php?_=' + Date.now());
+    const res = await fetch(
+      `api/get_finance.php?account=${getAccount()}&_=` + Date.now()
+    );
+
     const data = await res.json();
 
     console.log("FINANCE API:", data);
 
+    const setText = (id, value) => {
+      const el = document.getElementById(id);
+      if (el) el.innerText = value;
+    };
+
     // ================= KPI =================
-    document.getElementById('kpi-cashin').innerText =
-      "£" + Number(data.cash_in || 0).toLocaleString();
-
-    document.getElementById('kpi-cashout').innerText =
-      "£" + Number(data.cash_out || 0).toLocaleString();
-
-    document.getElementById('kpi-outstanding').innerText =
-      "£" + Number(data.outstanding || 0).toLocaleString();
-
-    document.getElementById('kpi-upcoming').innerText =
-      "£" + Number(data.upcoming || 0).toLocaleString();
-
-    document.getElementById('kpi-revenue').innerText =
-      "£" + Number(data.revenue || 0).toLocaleString();
+    setText('kpi-cashin', "£" + Number(data.cash_in || 0).toLocaleString());
+    setText('kpi-cashout', "£" + Number(data.cash_out || 0).toLocaleString());
+    setText('kpi-outstanding', "£" + Number(data.outstanding || 0).toLocaleString());
+    setText('kpi-upcoming', "£" + Number(data.upcoming || 0).toLocaleString());
+    setText('kpi-revenue', "£" + Number(data.revenue || 0).toLocaleString());
 
     // ================= CASHFLOW =================
     const weeks = ["Week 1", "Week 2", "Week 3", "Week 4"];
@@ -508,74 +491,84 @@ async function loadFinanceData() {
       data.cash_out
     ];
 
-    if (chartCashflow) chartCashflow.destroy();
+    const cashflowEl = document.querySelector("#cashflow-chart");
 
-    chartCashflow = new ApexCharts(document.querySelector("#cashflow-chart"), {
-      chart: { type: "line", height: 300 },
-      series: [
-        { name: "Cash In", data: cashInTrend },
-        { name: "Cash Out", data: cashOutTrend }
-      ],
-      colors: ['#198754', '#dc3545'],
-      stroke: { curve: "smooth" },
-      xaxis: { categories: weeks },
-      tooltip: {
-        y: { formatter: val => "£" + val.toLocaleString() }
-      }
-    });
+    if (cashflowEl) {
+      if (chartCashflow) chartCashflow.destroy();
 
-    chartCashflow.render();
+      chartCashflow = new ApexCharts(cashflowEl, {
+        chart: { type: "line", height: 300 },
+        series: [
+          { name: "Cash In", data: cashInTrend },
+          { name: "Cash Out", data: cashOutTrend }
+        ],
+        colors: ['#198754', '#dc3545'],
+        stroke: { curve: "smooth" },
+        xaxis: { categories: weeks },
+        tooltip: {
+          y: { formatter: val => "£" + val.toLocaleString() }
+        }
+      });
+
+      chartCashflow.render();
+    }
 
     // ================= REVENUE VS EXPENSE =================
     const months = ["Jan", "Feb", "Mar", "Apr"];
 
-    if (chartRevenue) chartRevenue.destroy();
+    const revenueEl = document.querySelector("#revenue-expense-chart");
 
-    chartRevenue = new ApexCharts(document.querySelector("#revenue-expense-chart"), {
-      chart: { type: "bar", height: 300 },
-      series: [
-        {
-          name: "Revenue",
-          data: [
-            data.revenue * 0.6,
-            data.revenue * 0.75,
-            data.revenue * 0.85,
-            data.revenue
-          ]
+    if (revenueEl) {
+      if (chartRevenue) chartRevenue.destroy();
+
+      chartRevenue = new ApexCharts(revenueEl, {
+        chart: { type: "bar", height: 300 },
+        series: [
+          {
+            name: "Revenue",
+            data: [
+              data.revenue * 0.6,
+              data.revenue * 0.75,
+              data.revenue * 0.85,
+              data.revenue
+            ]
+          },
+          {
+            name: "Expenses",
+            data: [
+              data.cash_out * 0.7,
+              data.cash_out * 0.8,
+              data.cash_out * 0.9,
+              data.cash_out
+            ]
+          }
+        ],
+        colors: ['#0d6efd', '#dc3545'],
+        xaxis: { categories: months },
+        plotOptions: {
+          bar: { borderRadius: 6, columnWidth: "45%" }
         },
-        {
-          name: "Expenses",
-          data: [
-            data.cash_out * 0.7,
-            data.cash_out * 0.8,
-            data.cash_out * 0.9,
-            data.cash_out
-          ]
+        tooltip: {
+          y: { formatter: val => "£" + val.toLocaleString() }
         }
-      ],
-      colors: ['#0d6efd', '#dc3545'],
-      xaxis: { categories: months },
-      plotOptions: {
-        bar: { borderRadius: 6, columnWidth: "45%" }
-      },
-      tooltip: {
-        y: { formatter: val => "£" + val.toLocaleString() }
-      }
-    });
+      });
 
-    chartRevenue.render();
+      chartRevenue.render();
+    }
 
   } catch (err) {
-    console.error(err);
+    console.error("FINANCE ERROR:", err);
   }
 
   isLoading = false;
 }
 
-// LOAD + AUTO REFRESH
+// ==============================
+// 🔥 LOAD + AUTO REFRESH
+// ==============================
 document.addEventListener("DOMContentLoaded", () => {
-  loadFinanceData();
-  setInterval(loadFinanceData, 60000);
+  refreshPageData();
+  setInterval(refreshPageData, 60000);
 });
 </script>
 

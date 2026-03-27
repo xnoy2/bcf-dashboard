@@ -98,14 +98,14 @@
                 />
                 <span class="d-none d-md-inline">Nicola Graham</span>
               </a>
-              <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-
-                <li class="user-footer">
-                  <a href="#" class="btn btn-default btn-flat">Profile</a>
-                  <a href="./api/logout.php" class="btn btn-default btn-flat float-end">Sign out</a>
-                </li>
-                <!--end::Menu Footer-->
-              </ul>
+              <ul class="dropdown-menu dropdown-menu-end p-2" style="min-width: 180px;">
+              <li>
+                <a href="./api/logout.php" class="dropdown-item text-danger d-flex align-items-center">
+                  <i class="bi bi-box-arrow-right me-2"></i>
+                  Sign out
+                </a>
+              </li>
+            </ul>
             </li>
             <!--end::User Menu Dropdown-->
           </ul>
@@ -121,14 +121,11 @@
           <!--begin::Brand Link-->
           <a href="./index.html" class="brand-link">
             <!--begin::Brand Image-->
-            <img
-              src="./assets/img/bcf.png"
-              alt="BCF Logo"
-              class="brand-image opacity-75 shadow"
-            />
+            <img id="accountLogo" src="./assets/img/bcf.png" alt="Logo" class="brand-image">
             <!--end::Brand Image-->
             <!--begin::Brand Text-->
-            <span class="brand-text fw-light">Admin</span>
+            <span id="accountName" class="brand-text fw-light">BCF</span>
+            
             <!--end::Brand Text-->
           </a>
           <!--end::Brand Link-->
@@ -318,16 +315,17 @@
       <!--end::App Main-->
       <!--begin::Footer-->
       <footer class="app-footer">
-        <!--begin::To the end-->
-        <div class="float-end d-none d-sm-inline">Anything you want</div>
-        <!--end::To the end-->
-        <!--begin::Copyright-->
+        <!-- Right side -->
+        <div class="float-end d-none d-sm-inline">
+          v1.0
+        </div>
+
+        <!-- Left side -->
         <strong>
-          Footer -- -- &nbsp;
-          <a href="https://adminlte.io" class="text-decoration-none">BalleyCastleTestUI</a>.
+          © <?php echo date('Y'); ?>
+          <a href="#" class="text-decoration-none">Ballycastle Admin Dashboard</a>.
         </strong>
         All rights reserved.
-        <!--end::Copyright-->
       </footer>
       <!--end::Footer-->
     </div>
@@ -351,7 +349,8 @@
     <!--end::Required Plugin(Bootstrap 5)--><!--begin::Required Plugin(AdminLTE)-->
     <script src="./js/adminlte.js"></script>
     <!--end::Required Plugin(AdminLTE)--><!--begin::OverlayScrollbars Configure-->
-    
+    <script src="./js/account_ui.js"></script>
+
    <script>
 const SHEET_URL = "https://opensheet.elk.sh/1t-DzS_uln-2JrXvqwawU_g2UVepmVPIZ8sCCO-ng_LU/API";
 

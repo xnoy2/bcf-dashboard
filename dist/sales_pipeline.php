@@ -72,6 +72,22 @@
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+      .card-body {
+      min-height: 320px;
+    }
+
+    #revenue-chart,
+    #sales-chart,
+    #lead-sources-chart {
+      width: 100%;
+      height: 100%;
+    }
+    .card {
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    </style>
   </head>
   <!--end::Head-->
   <!--begin::Body-->
@@ -99,14 +115,14 @@
                 />
                 <span class="d-none d-md-inline">Nicola Graham</span>
               </a>
-              <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-
-                <li class="user-footer">
-                  <a href="#" class="btn btn-default btn-flat">Profile</a>
-                  <a href="./api/logout.php" class="btn btn-default btn-flat float-end">Sign out</a>
-                </li>
-                <!--end::Menu Footer-->
-              </ul>
+              <ul class="dropdown-menu dropdown-menu-end p-2" style="min-width: 180px;">
+              <li>
+                <a href="./api/logout.php" class="dropdown-item text-danger d-flex align-items-center">
+                  <i class="bi bi-box-arrow-right me-2"></i>
+                  Sign out
+                </a>
+              </li>
+            </ul>
             </li>
             <!--end::User Menu Dropdown-->
           </ul>
@@ -122,14 +138,10 @@
           <!--begin::Brand Link-->
           <a href="./index.html" class="brand-link">
             <!--begin::Brand Image-->
-            <img
-              src="./assets/img/bcf.png"
-              alt="BCF Logo"
-              class="brand-image opacity-75 shadow"
-            />
+            <img id="accountLogo" src="./assets/img/bcf.png" alt="Logo" class="brand-image">
             <!--end::Brand Image-->
             <!--begin::Brand Text-->
-            <span class="brand-text fw-light">Admin</span>
+            <span id="accountName" class="brand-text fw-light">BCF</span>
             <!--end::Brand Text-->
           </a>
           <!--end::Brand Link-->
@@ -305,28 +317,31 @@
             </div>
             <!--end::Row-->
             <!--begin::Row-->
-            <div class="row">
-              <!-- Start col -->
-              <div class="col-lg-4 connectedSortable">
-                <div class="card mb-4">
+            <div class="row g-3 align-items-stretch">
+
+            <!-- 🔹 Leads Trend -->
+            <div class="col-lg-4 col-md-6 d-flex">
+              <div class="card w-100 h-100 mb-0">
                 <div class="card-header">
-                    <h3 class="card-title">Leads Trend by Week</h3>
+                  <h3 class="card-title">Leads Trend by Week</h3>
                 </div>
-                <div class="card-body">
-                    <div id="revenue-chart"></div>
+
+                <div class="card-body d-flex flex-column">
+                  <div id="revenue-chart" class="flex-grow-1"></div>
                 </div>
-                </div>
-                <!-- /.card -->                
               </div>
-              <!-- /.Start col -->
-              <!-- Start col -->
-              <div class="col-lg-4 connectedSortable">
-                <div class="card mb-4">
-                  <div class="card-header border-0">
+            </div>
+
+            <!-- 🔹 Pipeline -->
+            <div class="col-lg-4 col-md-6 d-flex">
+              <div class="card w-100 h-100 mb-0">
+
+                <div class="card-header border-0">
                   <div class="d-flex justify-content-between">
                     <h3 class="card-title">Pipeline by Stage</h3>
                     <a
-                      href="https://app.gohighlevel.com/v2/location/GSxspezlKiWYWE604ot9/dashboard" target="_blank"
+                      href="https://app.gohighlevel.com/v2/location/GSxspezlKiWYWE604ot9/dashboard"
+                      target="_blank"
                       class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
                     >
                       View Report
@@ -334,62 +349,68 @@
                   </div>
                 </div>
 
-                <div class="card-body">
-                  <div class="d-flex">
-                    <p class="d-flex flex-column">
-                      <span class="fw-bold fs-5">85 Leads</span>
-                      <span>Current Sales Pipeline</span>
+                <div class="card-body d-flex flex-column">
+
+                  <div class="d-flex mb-2">
+                    <p class="d-flex flex-column mb-0">
+                      <span class="fw-bold fs-5" id="pipeline-total">0</span>
+                      <span>Total Leads in Pipeline</span>
                     </p>
-                    <p class="ms-auto d-flex flex-column text-end">
-                      <span class="text-success">
-                        <i class="bi bi-arrow-up"></i> 12.5%
-                      </span>
+
+                    <p class="ms-auto d-flex flex-column text-end mb-0">
+                      <span id="pipeline-growth"></span>
                       <span class="text-secondary">Since Last Week</span>
                     </p>
                   </div>
 
-                  <div class="position-relative mb-4"  style="margin-top:-30px">
-                    <div id="sales-chart" style="margin-bottom: -15.8px;"></div>
+                  <div class="flex-grow-1">
+                    <div id="sales-chart"></div>
                   </div>
+
                 </div>
-                  </div>
               </div>
-              <div class="col-lg-4 connectedSortable">
-                <div class="card mb-4">
-            <div class="card-header border-0">
-                <div class="d-flex justify-content-between">
-                <h3 class="card-title">Lead Sources</h3>
-                <a
-                    href="https://app.gohighlevel.com/v2/location/GSxspezlKiWYWE604ot9/dashboard" target="_blank"
-                    class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
-                >
-                    View Report
-                </a>
-                </div>
             </div>
 
-            <div class="card-body">
-                <div class="d-flex">
-                <p class="d-flex flex-column">
-                    <span class="fw-bold fs-5">42 Leads</span>
-                    <span>Lead Sources Overview</span>
-                </p>
-                <p class="ms-auto d-flex flex-column text-end">
-                    <span class="text-success">
-                    <i class="bi bi-arrow-up"></i> 8.4%
-                    </span>
-                    <span class="text-secondary">Since Last Week</span>
-                </p>
+            <!-- 🔹 Lead Sources -->
+            <div class="col-lg-4 col-md-6 d-flex">
+              <div class="card w-100 h-100 mb-0">
+
+                <div class="card-header border-0">
+                  <div class="d-flex justify-content-between">
+                    <h3 class="card-title">Lead Sources</h3>
+                    <a
+                      href="https://app.gohighlevel.com/v2/location/GSxspezlKiWYWE604ot9/dashboard"
+                      target="_blank"
+                      class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
+                    >
+                      View Report
+                    </a>
+                  </div>
                 </div>
 
-                <div class="position-relative mb-4" style="margin-top: -25px;">
-                <div id="lead-sources-chart"></div>
+                <div class="card-body d-flex flex-column">
+
+                  <div class="d-flex mb-2">
+                    <p class="d-flex flex-column mb-0">
+                      <span class="fw-bold fs-5" id="sources-total">0</span>
+                      <span>Lead Sources Overview</span>
+                    </p>
+
+                    <p class="ms-auto d-flex flex-column text-end mb-0">
+                      <span id="sources-growth"></span>
+                      <span class="text-secondary">Since Last Week</span>
+                    </p>
+                  </div>
+
+                  <div class="flex-grow-1">
+                    <div id="lead-sources-chart"></div>
+                  </div>
+
                 </div>
-            </div>
-            </div>
               </div>
-              <!-- /.Start col -->
             </div>
+
+          </div>
             <!-- /.row (main row) -->
           </div>
           <!--end::Container-->
@@ -399,16 +420,17 @@
       <!--end::App Main-->
       <!--begin::Footer-->
       <footer class="app-footer">
-        <!--begin::To the end-->
-        <div class="float-end d-none d-sm-inline">Anything you want</div>
-        <!--end::To the end-->
-        <!--begin::Copyright-->
+        <!-- Right side -->
+        <div class="float-end d-none d-sm-inline">
+          v1.0
+        </div>
+
+        <!-- Left side -->
         <strong>
-          Footer -- -- &nbsp;
-          <a href="https://adminlte.io" class="text-decoration-none">BalleyCastleTestUI</a>.
+          © <?php echo date('Y'); ?>
+          <a href="#" class="text-decoration-none">Ballycastle Admin Dashboard</a>.
         </strong>
         All rights reserved.
-        <!--end::Copyright-->
       </footer>
       <!--end::Footer-->
     </div>
@@ -436,121 +458,277 @@
     <!-- KEEP ALL YOUR ORIGINAL HTML ABOVE (no changes needed) -->
 
 <!-- ================= REQUIRED SCRIPTS ================= -->
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-
+<script
+      src="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.min.js"
+      integrity="sha256-+vh8GkaU7C9/wbSLIcwq82tQ2wTf44aOHA8HlBMwRI8="
+      crossorigin="anonymous"
+    ></script>
+<script src="./js/account_ui.js"></script>
 <script>
+// ==============================
+// 🔥 MAIN REFRESH
+// ==============================
+function refreshPageData() {
+  loadPipelineData();
+}
+
+// ==============================
+// ✅ ACCOUNT HELPER
+// ==============================
+function getAccount() {
+  return localStorage.getItem('account') || 'bcf';
+}
+
+// ==============================
+// 📊 SALES PIPELINE
+// ==============================
 let chartTrend, chartStages, chartSources;
 let isLoading = false;
 
-async function loadDashboardData() {
+async function loadPipelineData() {
   if (isLoading) return;
   isLoading = true;
 
   try {
-    const res = await fetch('api/get_pipeline.php?_=' + Date.now());
+    const account = getAccount();
+
+    const res = await fetch(
+      `api/get_pipeline.php?account=${account}&_=` + Date.now()
+    );
+
     const data = await res.json();
 
-    console.log("API DATA:", data);
+    console.log("PIPELINE DATA:", data);
 
-    // ================= KPI =================
-    document.getElementById('kpi-leads').innerText = data.weekly_leads ?? 0;
-    document.getElementById('kpi-quotes').innerText = data.quotes_issued ?? 0;
-    document.getElementById('kpi-closed').innerText = data.closed_sales ?? 0;
-    document.getElementById('kpi-pipeline').innerText =
-      "£" + Number(data.pipeline_value ?? 0).toLocaleString();
+    const setText = (id, value) => {
+      const el = document.getElementById(id);
+      if (el) el.innerText = value;
+    };
 
-    // ================= 1. LEADS TREND =================
-    const weeks = Object.keys(data.weekly_trend || {});
-    const leads = Object.values(data.weekly_trend || {});
+     // 🔥 FIXED HERE
+    setText('kpi-leads', data.new_leads ?? data.weekly_leads ?? 0);
+    setText('kpi-quotes', data.quotes_issued ?? 0);
+    setText('kpi-closed', data.closed_sales ?? 0);
+    setText('kpi-pipeline', "£" + Number(data.pipeline_value ?? 0).toLocaleString());
 
-    if (chartTrend) chartTrend.destroy();
+   // ================= 1. LEADS TREND (CEO VERSION 🔥) =================
+const trendEl = document.querySelector("#revenue-chart");
 
-    chartTrend = new ApexCharts(document.querySelector("#revenue-chart"), {
-      chart: {
-        type: "area",
-        height: 250,
-        toolbar: { show: false }
-      },
-      series: [{
-        name: "Leads",
-        data: leads
-      }],
-      xaxis: {
-        categories: weeks
-      },
-      stroke: {
-        curve: "smooth"
-      },
-      dataLabels: {
-        enabled: false
+if (trendEl) {
+
+  // 🔥 GROUP INTO WEEKS
+  const rawData = data.weekly_trend || [];
+  const weeklyGrouped = [];
+
+  for (let i = 0; i < rawData.length; i += 7) {
+    const weekSum = rawData.slice(i, i + 7)
+      .reduce((a, b) => a + b, 0);
+
+    weeklyGrouped.push(weekSum);
+  }
+
+  const weekLabels = weeklyGrouped.map((_, i) => `Week ${i + 1}`);
+
+  if (chartTrend) chartTrend.destroy();
+
+  chartTrend = new ApexCharts(trendEl, {
+    chart: {
+      type: "area",
+      height: 280,
+      toolbar: { show: false }
+    },
+    series: [{
+      name: "Leads",
+      data: weeklyGrouped
+    }],
+    xaxis: {
+      categories: weekLabels
+    },
+    stroke: {
+      curve: "smooth",
+      width: 3
+    },
+    markers: {
+      size: 4
+    },
+    dataLabels: {
+      enabled: false
+    },
+    tooltip: {
+      y: {
+        formatter: val => `${val} leads`
       }
-    });
+    }
+  });
 
-    chartTrend.render();
+  chartTrend.render();
+}
 
     // ================= 2. PIPELINE BY STAGE =================
-    const stages = Object.keys(data.stages || {});
-    const stageValues = Object.values(data.stages || {});
+    const STAGE_ORDER = [
+  { key: "new lead", label: "New Lead" },
+  { key: "qualified lead", label: "Qualified Lead" },
+  { key: "called", label: "Called ASAP" },
+  { key: "follow-up 1", label: "Follow-up 1" },
+  { key: "follow-up 2", label: "Follow-up 2" },
+  { key: "quote", label: "Quote Sent" },
+  { key: "deposit", label: "Deposit Taken" },
+  { key: "closed won", label: "Closed Won" },
+  { key: "closed lost", label: "Closed Lost" }
+];
 
-    if (chartStages) chartStages.destroy();
+const stagesData = data.stages || {};
 
-    chartStages = new ApexCharts(document.querySelector("#sales-chart"), {
-      chart: {
-        type: "bar",
-        height: 250,
-        toolbar: { show: false }
-      },
-      series: [{
-        name: "Leads",
-        data: stageValues
-      }],
-      xaxis: {
-        categories: stages
-      },
-      plotOptions: {
-        bar: {
-          borderRadius: 6,
-          columnWidth: "45%"
+const stages = [];
+const stageValues = [];
+
+STAGE_ORDER.forEach(stage => {
+  let total = 0;
+
+  Object.keys(stagesData).forEach(actualStage => {
+    if (actualStage.toLowerCase().includes(stage.key)) {
+      total += stagesData[actualStage];
+    }
+  });
+
+  if (total > 0) {
+    stages.push(stage.label);
+    stageValues.push(total);
+  }
+});
+
+    const stageEl = document.querySelector("#sales-chart");
+
+    if (stageEl) {
+      if (chartStages) chartStages.destroy();
+
+      chartStages = new ApexCharts(stageEl, {
+        chart: {
+          type: "bar",
+          height: 250,
+          toolbar: { show: false }
+        },
+        series: [{
+          name: "Leads",
+          data: stageValues
+        }],
+        xaxis: {
+          categories: stages
+        },
+        plotOptions: {
+          bar: {
+            borderRadius: 6,
+            columnWidth: "45%"
+          }
+        },
+        dataLabels: {
+          enabled: false
         }
-      },
-      dataLabels: {
-        enabled: true
-      }
-    });
+      });
 
-    chartStages.render();
+      chartStages.render();
+    }
+   // ==============================
+// 🔥 PIPELINE TOTAL (DYNAMIC)
+// ==============================
 
-    // ================= 3. LEAD SOURCES =================
-    const sources = Object.keys(data.lead_sources || {});
-    const sourceValues = Object.values(data.lead_sources || {});
+let totalPipeline = Object.values(stagesData)
+  .reduce((sum, val) => sum + val, 0);
 
-    if (chartSources) chartSources.destroy();
+const currentWeek = data.weekly_leads || 0;
+const lastWeek = data.last_week_leads || 0;
 
-    chartSources = new ApexCharts(document.querySelector("#lead-sources-chart"), {
-      chart: {
-        type: "donut",
-        height: 260
-      },
-      series: sourceValues,
-      labels: sources,
-      legend: {
-        position: "bottom"
-      }
-    });
+let percent = lastWeek > 0
+  ? ((currentWeek - lastWeek) / lastWeek) * 100
+  : 0;
 
-    chartSources.render();
+percent = percent.toFixed(1);
+
+const pipelineEl = document.getElementById("pipeline-total");
+const growthEl = document.getElementById("pipeline-growth");
+
+if (pipelineEl) pipelineEl.innerText = totalPipeline + " Leads";
+
+if (growthEl) {
+  growthEl.innerHTML =
+    `<i class="bi bi-arrow-${percent >= 0 ? "up" : "down"}"></i> ${Math.abs(percent)}%`;
+
+  growthEl.className =
+    percent >= 0 ? "text-success" : "text-danger";
+}
+
+// ==============================
+// 🔥 LEAD SOURCES % (FIXED)
+// ==============================
+const sourcesData = data.lead_sources || {};
+
+const sources = Object.keys(sourcesData);
+const sourceValues = Object.values(sourcesData);
+
+// ✅ TOTAL SOURCES (🔥 NEW)
+const totalSources = sourceValues.reduce((sum, val) => sum + val, 0);
+
+// update UI
+const sourcesTotalEl = document.getElementById("sources-total");
+if (sourcesTotalEl) {
+  sourcesTotalEl.innerText = totalSources + " Leads";
+}
+
+// ================= % CALC (SAFE FIX) =================
+let sourcePercent = 0;
+
+if (lastWeek > 0) {
+  sourcePercent = ((currentWeek - lastWeek) / lastWeek) * 100;
+}
+
+sourcePercent = sourcePercent.toFixed(1);
+
+// update % UI
+const sourcesGrowthEl = document.getElementById("sources-growth");
+
+if (sourcesGrowthEl) {
+  sourcesGrowthEl.innerHTML =
+    `<i class="bi bi-arrow-${sourcePercent >= 0 ? "up" : "down"}"></i> ${Math.abs(sourcePercent)}%`;
+
+  sourcesGrowthEl.className =
+    sourcePercent >= 0 ? "text-success" : "text-danger";
+}
+
+// ================= CHART =================
+const sourceEl = document.querySelector("#lead-sources-chart");
+
+if (sourceEl && sourceValues.length > 0) {
+  if (chartSources) chartSources.destroy();
+
+  chartSources = new ApexCharts(sourceEl, {
+    chart: {
+      type: "donut",
+      height: 260
+    },
+    series: sourceValues,
+    labels: sources,
+    legend: {
+      position: "bottom"
+    }
+  });
+
+  chartSources.render();
+}
 
   } catch (err) {
-    console.error("Dashboard error:", err);
+    console.error("Pipeline error:", err);
   }
 
   isLoading = false;
 }
 
-// ================= LOAD =================
+
+// ==============================
+// 🔥 LOAD
+// ==============================
 document.addEventListener("DOMContentLoaded", () => {
-  loadDashboardData();
-  setInterval(loadDashboardData, 60000);
+  refreshPageData();
+  setInterval(refreshPageData, 60000);
 });
 </script>
   </body>

@@ -98,14 +98,14 @@
                 />
                 <span class="d-none d-md-inline">Nicola Graham</span>
               </a>
-              <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-
-                <li class="user-footer">
-                  <a href="#" class="btn btn-default btn-flat">Profile</a>
-                  <a href="./api/logout.php" class="btn btn-default btn-flat float-end">Sign out</a>
-                </li>
-                <!--end::Menu Footer-->
-              </ul>
+              <ul class="dropdown-menu dropdown-menu-end p-2" style="min-width: 180px;">
+              <li>
+                <a href="./api/logout.php" class="dropdown-item text-danger d-flex align-items-center">
+                  <i class="bi bi-box-arrow-right me-2"></i>
+                  Sign out
+                </a>
+              </li>
+            </ul>
             </li>
             <!--end::User Menu Dropdown-->
           </ul>
@@ -121,14 +121,11 @@
           <!--begin::Brand Link-->
           <a href="./index.html" class="brand-link">
             <!--begin::Brand Image-->
-            <img
-              src="./assets/img/bcf.png"
-              alt="BCF Logo"
-              class="brand-image opacity-75 shadow"
-            />
+            <img id="accountLogo" src="./assets/img/bcf.png" alt="Logo" class="brand-image">
             <!--end::Brand Image-->
             <!--begin::Brand Text-->
-            <span class="brand-text fw-light">Admin</span>
+            <span id="accountName" class="brand-text fw-light">BCF</span>
+            
             <!--end::Brand Text-->
           </a>
           <!--end::Brand Link-->
@@ -378,16 +375,17 @@
       <!--end::App Main-->
       <!--begin::Footer-->
       <footer class="app-footer">
-        <!--begin::To the end-->
-        <div class="float-end d-none d-sm-inline">Anything you want</div>
-        <!--end::To the end-->
-        <!--begin::Copyright-->
+        <!-- Right side -->
+        <div class="float-end d-none d-sm-inline">
+          v1.0
+        </div>
+
+        <!-- Left side -->
         <strong>
-          Footer -- -- &nbsp;
-          <a href="https://adminlte.io" class="text-decoration-none">BalleyCastleTestUI</a>.
+          © <?php echo date('Y'); ?>
+          <a href="#" class="text-decoration-none">Ballycastle Admin Dashboard</a>.
         </strong>
         All rights reserved.
-        <!--end::Copyright-->
       </footer>
       <!--end::Footer-->
     </div>
@@ -425,14 +423,46 @@
       crossorigin="anonymous"
     ></script>
     <!-- sortablejs -->
+    <script src="./js/account_ui.js"></script>
+
    <script>
 let systemChart;
 let complianceChart;
+let isLoading = false;
+let lastDataHash = null;
 
+// ==============================
+// ✅ GET ACCOUNT (IMPORTANT)
+// ==============================
+function getAccount() {
+  return localStorage.getItem('account') || 'bcf';
+}
+
+// ==============================
+// 🔥 LOAD SECURITY DATA (OPTIMIZED)
+// ==============================
 async function loadSecurityData() {
+  if (isLoading) return; // prevent duplicate calls
+  isLoading = true;
+
   try {
-    const res = await fetch('api/get_security.php');
+    const account = getAccount();
+
+    const res = await fetch(
+      `api/get_security.php?account=${account}&_=` + Date.now()
+    );
+
     const data = await res.json();
+
+    // ==========================
+    // 🧠 PREVENT UNNECESSARY RERENDER
+    // ==========================
+    const newHash = JSON.stringify(data);
+    if (newHash === lastDataHash) {
+      isLoading = false;
+      return; // no changes → skip rendering
+    }
+    lastDataHash = newHash;
 
     console.log("SECURITY DATA:", data);
 
@@ -441,7 +471,7 @@ async function loadSecurityData() {
     // ==========================
     const setText = (id, value) => {
       const el = document.getElementById(id);
-      if (el) el.innerText = value;
+      if (el) el.innerText = value ?? 0;
     };
 
     setText('kpi-domains', data.domains);
@@ -458,9 +488,9 @@ async function loadSecurityData() {
 
     if (systemEl) {
       const systemData = [
-        data.system_health.healthy,
-        data.system_health.warning,
-        data.system_health.critical
+        data.system_health?.healthy || 0,
+        data.system_health?.warning || 0,
+        data.system_health?.critical || 0
       ];
 
       if (systemChart) {
@@ -468,7 +498,7 @@ async function loadSecurityData() {
       } else {
         systemChart = new ApexCharts(systemEl, {
           series: systemData,
-          chart: { type: 'donut', height: 280 },
+          chart: { type: 'donut', height: 260 },
           labels: ['Healthy', 'Warning', 'Critical'],
           colors: ['#198754', '#ffc107', '#dc3545']
         });
@@ -484,10 +514,10 @@ async function loadSecurityData() {
 
     if (complianceEl) {
       const complianceData = [
-        data.compliance.mfa,
-        data.compliance.backups,
-        data.compliance.dns,
-        data.compliance.ssl
+        data.compliance?.mfa || 0,
+        data.compliance?.backups || 0,
+        data.compliance?.dns || 0,
+        data.compliance?.ssl || 0
       ];
 
       if (complianceChart) {
@@ -495,7 +525,7 @@ async function loadSecurityData() {
       } else {
         complianceChart = new ApexCharts(complianceEl, {
           series: [{ data: complianceData }],
-          chart: { type: 'bar', height: 300 },
+          chart: { type: 'bar', height: 280 },
           xaxis: {
             categories: ['MFA', 'Backups', 'DNS', 'SSL']
           },
@@ -507,25 +537,26 @@ async function loadSecurityData() {
     }
 
     // ==========================
-    // TABLE (🔥 THIS WAS MISSING)
+    // TABLE (OPTIMIZED)
     // ==========================
     const table = document.getElementById('security-table-body');
 
     if (table && data.domains_list) {
-      table.innerHTML = '';
+
+      let rows = "";
+
+      const badge = (ok) =>
+        ok
+          ? '<span class="badge bg-success">OK</span>'
+          : '<span class="badge bg-danger">Missing</span>';
 
       data.domains_list.forEach(domain => {
-
-        const badge = (ok) =>
-          ok
-            ? '<span class="badge bg-success">OK</span>'
-            : '<span class="badge bg-danger">Missing</span>';
 
         const statusBadge = domain.ssl
           ? '<span class="badge bg-success">Healthy</span>'
           : '<span class="badge bg-danger">Issue</span>';
 
-        table.innerHTML += `
+        rows += `
           <tr>
             <td>${domain.name}</td>
             <td>Domain</td>
@@ -538,18 +569,26 @@ async function loadSecurityData() {
           </tr>
         `;
       });
+
+      table.innerHTML = rows; // 🔥 single DOM update
     }
 
   } catch (error) {
-    console.error("Dashboard Error:", error);
+    console.error("Security Error:", error);
   }
+
+  isLoading = false;
 }
 
-// ==========================
-// LOAD + AUTO REFRESH
-// ==========================
-loadSecurityData();
-setInterval(loadSecurityData, 60000);
+// ==============================
+// 🚀 LOAD + SMART REFRESH
+// ==============================
+document.addEventListener("DOMContentLoaded", () => {
+  loadSecurityData();
+
+  // refresh every 2 mins instead of 1
+  setInterval(loadSecurityData, 120000);
+});
 </script>
   </body>
   <!--end::Body-->

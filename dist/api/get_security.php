@@ -18,7 +18,18 @@ if (!isset($_SESSION['user'])) {
 // ==============================
 $config = require __DIR__ . '/../auth/config.php';
 
-$apiToken = $config['CLOUDFLARE']['API_TOKEN'];
+// 🔥 NEW: MULTI-ACCOUNT SUPPORT (SAFE)
+$accounts = $config['ACCOUNTS'];
+$selectedAccount = $_GET['account'] ?? 'bcf';
+
+// fallback safety
+if (!isset($accounts[$selectedAccount])) {
+    $selectedAccount = 'bcf';
+}
+
+// 🔥 REPLACED (ONLY THIS LINE CHANGED)
+$apiToken = $accounts[$selectedAccount]['CLOUDFLARE']['API_TOKEN'];
+
 
 // ==============================
 // 🔧 CURL HELPER
@@ -43,7 +54,7 @@ function curlGet($url, $token) {
 }
 
 // ==============================
-// 🌐 DNS CHECK (SPF / DKIM / DMARC / MX)
+// 🌐 DNS CHECK
 // ==============================
 function checkDNS($domain) {
 
@@ -54,7 +65,6 @@ function checkDNS($domain) {
         "mx" => false
     ];
 
-    // SPF
     $txtRecords = dns_get_record($domain, DNS_TXT);
     if ($txtRecords) {
         foreach ($txtRecords as $record) {
@@ -64,7 +74,6 @@ function checkDNS($domain) {
         }
     }
 
-    // DMARC
     $dmarc = dns_get_record("_dmarc.$domain", DNS_TXT);
     if ($dmarc) {
         foreach ($dmarc as $record) {
@@ -74,13 +83,11 @@ function checkDNS($domain) {
         }
     }
 
-    // DKIM (default selector)
     $dkim = dns_get_record("default._domainkey.$domain", DNS_TXT);
     if (!empty($dkim)) {
         $result['dkim'] = true;
     }
 
-    // MX
     $mx = dns_get_record($domain, DNS_MX);
     if (!empty($mx)) {
         $result['mx'] = true;
@@ -161,7 +168,6 @@ foreach ($domains as $domain) {
     if ($dns['dmarc']) $dnsHealth['dmarc']++;
     if ($dns['mx']) $dnsHealth['mx']++;
 
-    // ================= STORE =================
     $domainsList[] = [
         "name" => $domainName,
         "ssl" => $sslOk,
@@ -173,7 +179,7 @@ foreach ($domains as $domain) {
 }
 
 // ==============================
-// 📊 COMPLIANCE (DYNAMIC)
+// 📊 COMPLIANCE
 // ==============================
 $totalDomains = count($domains);
 if ($totalDomains == 0) $totalDomains = 1;
@@ -185,12 +191,12 @@ $dnsPassed = $dnsHealth['spf'] + $dnsHealth['dkim'] + $dnsHealth['dmarc'] + $dns
 
 $dnsPercent = round(($dnsPassed / $dnsTotalChecks) * 100);
 
-// Placeholder (next step = M365 API)
+// placeholders
 $mfaPercent = 65;
 $backupPercent = 100;
 
 // ==============================
-// 🚨 SIMPLE ALERT LOGIC
+// 🚨 ALERTS
 // ==============================
 $alertMessages = [];
 
@@ -203,7 +209,7 @@ if ($dnsPercent < 80) {
 }
 
 // ==============================
-// 📤 OUTPUT
+// 📤 OUTPUT (UNCHANGED)
 // ==============================
 echo json_encode([
     "domains" => count($domains),
