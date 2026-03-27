@@ -23,7 +23,7 @@ nbproject/private
 
 # Hide config files
 # Hide all env/config variants
-#.env
+.env
 *.ini
 dist/api/cache_*.json
 
