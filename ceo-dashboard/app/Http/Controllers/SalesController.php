@@ -17,10 +17,7 @@ class SalesController extends Controller
     public function index(Request $request)
     {
         $accounts = config('integrations.accounts');
-        $account  = $request->query('account', 'all');
-        if ($account !== 'all' && ! isset($accounts[$account])) {
-            $account = 'all';
-        }
+        $account  = $this->resolveAccount($request);
 
         return view('sales', [
             'account'      => $account,
