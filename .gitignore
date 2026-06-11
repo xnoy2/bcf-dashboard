@@ -25,6 +25,7 @@ nbproject/private
 # Hide all env/config variants
 .env
 *.ini
+dist/api/cache_*.json
 
 # Node / Bower
 node_modules/

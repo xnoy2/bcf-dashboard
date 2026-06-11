@@ -24,13 +24,13 @@ $accounts = $config['ACCOUNTS'] ?? [];
 $selectedAccount = $_GET['account'] ?? $_SESSION['account'] ?? 'bcf';
 
 // ==============================
-// 🔧 MAIN FUNCTION (YOUR LOGIC)
+// 🔧 MAIN FUNCTION (FIXED ONLY)
 // ==============================
 function processAccount($apiKey, $locationId)
 {
     $headers = [
         "Authorization: Bearer $apiKey",
-        "Version: 2021-07-28",
+        "Version: 2021-04-15", // ✅ FIXED VERSION
         "Content-Type: application/json"
     ];
 
@@ -56,43 +56,40 @@ function processAccount($apiKey, $locationId)
     }
 
     // ==============================
-    // 2. GET OPPORTUNITIES
+    // 2. GET OPPORTUNITIES (FIXED)
     // ==============================
     $allOpportunities = [];
-    $startAfterId = null;
+    $page = 1;
 
     do {
         $body = [
             "locationId" => $locationId,
-            "limit" => 100
+            "limit" => 100,
+            "page" => $page
         ];
 
-        if ($startAfterId) {
-            $body["startAfterId"] = $startAfterId;
-        }
-
         curl_setopt($ch, CURLOPT_URL, "https://services.leadconnectorhq.com/opportunities/search");
-        $params = http_build_query([
-    "locationId" => $locationId,
-    "limit" => 100
-    ]);
-    if ($startAfterId) $params .= "&startAfterId=" . urlencode($startAfterId);
-    curl_setopt($ch, CURLOPT_URL, "https://services.leadconnectorhq.com/opportunities/search?$params");
-    curl_setopt($ch, CURLOPT_HTTPGET, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
         $response = curl_exec($ch);
+
+        // ✅ ADD ERROR DEBUG (SAFE)
+        if (curl_errno($ch)) {
+            return ["error" => curl_error($ch)];
+        }
+
         $data = json_decode($response, true);
 
-        if (empty($data['opportunities'])) break;
+        if (!$data || empty($data['opportunities'])) break;
 
         $batch = $data['opportunities'];
         $allOpportunities = array_merge($allOpportunities, $batch);
 
-        $last = end($batch);
-        $startAfterId = $last['id'] ?? null;
+        $page++; // ✅ FIX pagination
 
-    } while (count($batch) === 100);
+    } while (!empty($batch));
 
     curl_close($ch);
 
@@ -101,6 +98,7 @@ function processAccount($apiKey, $locationId)
     // ==============================
     if (count($allOpportunities) === 0) {
         return [
+            "debug" => "No opportunities found",
             "weekly_leads" => 0,
             "pipeline_value" => 0,
             "closed_sales" => 0,
@@ -115,7 +113,7 @@ function processAccount($apiKey, $locationId)
     }
 
     // ==============================
-    // 3. PROCESS DATA
+    // 3. PROCESS DATA (UNCHANGED)
     // ==============================
     $totalValue = 0;
     $closedSales = 0;
@@ -197,12 +195,13 @@ function processAccount($apiKey, $locationId)
         "weekly_trend" => array_values($weeklyTrend),
         "weekly_labels" => array_keys($weeklyTrend),
         "lead_sources" => $leadSources,
-        "last_week_leads" => $lastWeekLeads
+        "last_week_leads" => $lastWeekLeads,
+        "total_opportunities" => count($allOpportunities) // ✅ DEBUG
     ];
 }
 
 // ==============================
-// 🌐 CEO VIEW (ALL)
+// 🌐 CEO VIEW (ALL) — UNCHANGED
 // ==============================
 if ($selectedAccount === 'all') {
 
@@ -244,7 +243,7 @@ if ($selectedAccount === 'all') {
 }
 
 // ==============================
-// 🎯 SINGLE ACCOUNT
+// 🎯 SINGLE ACCOUNT — UNCHANGED
 // ==============================
 if (!isset($accounts[$selectedAccount])) {
     echo json_encode(["error" => "Invalid account"]);
