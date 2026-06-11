@@ -99,14 +99,14 @@
                 />
                 <span class="d-none d-md-inline">Nicola Graham</span>
               </a>
-              <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-
-                <li class="user-footer">
-                  <a href="#" class="btn btn-default btn-flat">Profile</a>
-                  <a href="./api/logout.php" class="btn btn-default btn-flat float-end">Sign out</a>
-                </li>
-                <!--end::Menu Footer-->
-              </ul>
+              <ul class="dropdown-menu dropdown-menu-end p-2" style="min-width: 180px;">
+              <li>
+                <a href="./api/logout.php" class="dropdown-item text-danger d-flex align-items-center">
+                  <i class="bi bi-box-arrow-right me-2"></i>
+                  Sign out
+                </a>
+              </li>
+            </ul>
             </li>
             <!--end::User Menu Dropdown-->
           </ul>
@@ -122,14 +122,11 @@
           <!--begin::Brand Link-->
           <a href="./index.html" class="brand-link">
             <!--begin::Brand Image-->
-            <img
-              src="./assets/img/bcf.png"
-              alt="BCF Logo"
-              class="brand-image opacity-75 shadow"
-            />
+            <img id="accountLogo" src="./assets/img/bcf.png" alt="Logo" class="brand-image">
             <!--end::Brand Image-->
             <!--begin::Brand Text-->
-            <span class="brand-text fw-light">Admin</span>
+            <span id="accountName" class="brand-text fw-light">BCF</span>
+            
             <!--end::Brand Text-->
           </a>
           <!--end::Brand Link-->
@@ -236,105 +233,38 @@
         <div class="app-content">
           <!--begin::Container-->
           <div class="container-fluid">
-            <!--begin::Row-->
-            <div class="row">
-
-            <!-- User Management -->
-            <div class="col-md-4">
-              <div class="card mb-4 p-3">
-                <h5><i class="fas fa-users"></i> User Management</h5>
-                <p class="text-muted">Manage user accounts and access</p>
-                <ul>
-                  <li>Add / Remove Users</li>
-                  <li>Assign Roles</li>
-                  <li>Reset Passwords</li>
-                </ul>
-                <button class="btn btn-primary btn-sm">Manage Users</button>
-              </div>
+            <div class="card mb-4">
+            <div class="card-header">
+              <h3 class="card-title">Change Password</h3>
             </div>
 
-            <!-- Role Permissions -->
-            <div class="col-md-4">
-              <div class="card mb-4 p-3">
-                <h5><i class="fas fa-user-shield"></i> Role Permissions</h5>
-                <p class="text-muted">Control access levels</p>
-                <ul>
-                  <li>Admin Access</li>
-                  <li>Staff Permissions</li>
-                  <li>View / Edit Controls</li>
-                </ul>
-                <button class="btn btn-primary btn-sm">Manage Roles</button>
-              </div>
-            </div>
+            <div class="card-body">
+              <form id="changePasswordForm">
 
-            <!-- Integrations -->
-            <div class="col-md-4">
-              <div class="card mb-4 p-3">
-                <h5><i class="fas fa-plug"></i> Integrations</h5>
-                <p class="text-muted">Connect external systems</p>
-                <ul>
-                  <li>GoHighLevel (CRM)</li>
-                  <li>Google Drive</li>
-                  <li>Microsoft 365</li>
-                </ul>
-                <button class="btn btn-primary btn-sm">Manage Integrations</button>
-              </div>
-            </div>
+                <div class="mb-3">
+                  <label class="form-label">Current Password</label>
+                  <input type="password" class="form-control" id="oldPassword" required>
+                </div>
 
+                <div class="mb-3">
+                  <label class="form-label">New Password</label>
+                  <input type="password" class="form-control" id="newPassword" required>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">Confirm New Password</label>
+                  <input type="password" class="form-control" id="confirmPassword" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">
+                  Update Password
+                </button>
+
+                <div id="passwordMessage" class="mt-3 text-center"></div>
+
+              </form>
+            </div>
           </div>
-            <!--end::Row-->
-            <!--begin::Row-->
-            <div class="row">
-
-              <!-- Notifications -->
-              <div class="col-md-6">
-                <div class="card mb-4 p-3">
-                  <h5><i class="fas fa-bell"></i> Notification Settings</h5>
-                  <p class="text-muted">Control alerts and updates</p>
-
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" checked>
-                    <label class="form-check-label">Email Alerts</label>
-                  </div>
-
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox">
-                    <label class="form-check-label">SMS Notifications</label>
-                  </div>
-
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" checked>
-                    <label class="form-check-label">System Alerts</label>
-                  </div>
-
-                </div>
-              </div>
-
-              <!-- Dashboard Preferences -->
-              <div class="col-md-6">
-                <div class="card mb-4 p-3">
-                  <h5><i class="fas fa-sliders-h"></i> Dashboard Preferences</h5>
-                  <p class="text-muted">Customize dashboard view</p>
-
-                  <label class="form-label">Default View</label>
-                  <select class="form-select mb-2">
-                    <option>CEO Dashboard</option>
-                    <option>Marketing</option>
-                    <option>Operations</option>
-                  </select>
-
-                  <label class="form-label">Theme</label>
-                  <select class="form-select">
-                    <option>Light</option>
-                    <option>Dark</option>
-                  </select>
-
-                </div>
-              </div>
-
-            </div>
-            
-            <!-- /.row (main row) -->
           </div>
           <!--end::Container-->
         </div>
@@ -343,16 +273,17 @@
       <!--end::App Main-->
       <!--begin::Footer-->
       <footer class="app-footer">
-        <!--begin::To the end-->
-        <div class="float-end d-none d-sm-inline">Anything you want</div>
-        <!--end::To the end-->
-        <!--begin::Copyright-->
+        <!-- Right side -->
+        <div class="float-end d-none d-sm-inline">
+          v1.0
+        </div>
+
+        <!-- Left side -->
         <strong>
-          Footer -- -- &nbsp;
-          <a href="https://adminlte.io" class="text-decoration-none">BalleyCastleTestUI</a>.
+          © <?php echo date('Y'); ?>
+          <a href="#" class="text-decoration-none">Ballycastle Admin Dashboard</a>.
         </strong>
         All rights reserved.
-        <!--end::Copyright-->
       </footer>
       <!--end::Footer-->
     </div>
@@ -376,27 +307,7 @@
     <!--end::Required Plugin(Bootstrap 5)--><!--begin::Required Plugin(AdminLTE)-->
     <script src="./js/adminlte.js"></script>
     <!--end::Required Plugin(AdminLTE)--><!--begin::OverlayScrollbars Configure-->
-    
-    <script>
-      const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
-      const Default = {
-        scrollbarTheme: 'os-theme-light',
-        scrollbarAutoHide: 'leave',
-        scrollbarClickScroll: true,
-      };
-      document.addEventListener('DOMContentLoaded', function () {
-        const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
-        if (sidebarWrapper && OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined) {
-          OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
-            scrollbars: {
-              theme: Default.scrollbarTheme,
-              autoHide: Default.scrollbarAutoHide,
-              clickScroll: Default.scrollbarClickScroll,
-            },
-          });
-        }
-      });
-    </script>
+  
     <!--end::OverlayScrollbars Configure-->
     <!-- OPTIONAL SCRIPTS -->
     <!-- sortablejs -->
@@ -424,278 +335,8 @@
       integrity="sha256-+vh8GkaU7C9/wbSLIcwq82tQ2wTf44aOHA8HlBMwRI8="
       crossorigin="anonymous"
     ></script>
-    <!-- ChartJS -->
-    <script>
-const jobs_status_chart_options = {
-  series: [
-    {
-      name: 'Jobs',
-      data: [4, 8, 2, 5],
-    }
-  ],
-  chart: {
-    type: 'bar',
-    height: 300,
-    toolbar: { show: false }
-  },
-  colors: ['#0d6efd'],
-  plotOptions: {
-    bar: {
-      distributed: true,
-      borderRadius: 6,
-    }
-  },
-  xaxis: {
-    categories: ['Planned', 'In Progress', 'Delayed', 'Completed']
-  },
-  colors: ['#0d6efd', '#20c997', '#dc3545', '#198754'],
-  tooltip: {
-    y: {
-      formatter: val => val + ' jobs'
-    }
-  }
-};
-
-new ApexCharts(document.querySelector("#jobs-status-chart"), jobs_status_chart_options).render();
-</script>
-
-    <!-- jsvectormap -->
-    <script
-      src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/js/jsvectormap.min.js"
-      integrity="sha256-/t1nN2956BT869E6H4V1dnt0X5pAQHPytli+1nTZm2Y="
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/maps/world.js"
-      integrity="sha256-XPpPaZlU8S/HWf7FZLAncLg2SAkP8ScUTII89x9D3lY="
-      crossorigin="anonymous"
-    ></script>
-    <!-- jsvectormap -->
-    <script>
-      // World map by jsVectorMap
-      new jsVectorMap({
-        selector: '#world-map',
-        map: 'world',
-      });
-
-      // Sparkline charts
-      const option_sparkline1 = {
-        series: [
-          {
-            data: [1000, 1200, 920, 927, 931, 1027, 819, 930, 1021],
-          },
-        ],
-        chart: {
-          type: 'area',
-          height: 50,
-          sparkline: {
-            enabled: true,
-          },
-        },
-        stroke: {
-          curve: 'straight',
-        },
-        fill: {
-          opacity: 0.3,
-        },
-        yaxis: {
-          min: 0,
-        },
-        colors: ['#DCE6EC'],
-      };
-
-      const sparkline1 = new ApexCharts(document.querySelector('#sparkline-1'), option_sparkline1);
-      sparkline1.render();
-
-      const option_sparkline2 = {
-        series: [
-          {
-            data: [515, 519, 520, 522, 652, 810, 370, 627, 319, 630, 921],
-          },
-        ],
-        chart: {
-          type: 'area',
-          height: 50,
-          sparkline: {
-            enabled: true,
-          },
-        },
-        stroke: {
-          curve: 'straight',
-        },
-        fill: {
-          opacity: 0.3,
-        },
-        yaxis: {
-          min: 0,
-        },
-        colors: ['#DCE6EC'],
-      };
-
-      const sparkline2 = new ApexCharts(document.querySelector('#sparkline-2'), option_sparkline2);
-      sparkline2.render();
-
-      const option_sparkline3 = {
-        series: [
-          {
-            data: [15, 19, 20, 22, 33, 27, 31, 27, 19, 30, 21],
-          },
-        ],
-        chart: {
-          type: 'area',
-          height: 50,
-          sparkline: {
-            enabled: true,
-          },
-        },
-        stroke: {
-          curve: 'straight',
-        },
-        fill: {
-          opacity: 0.3,
-        },
-        yaxis: {
-          min: 0,
-        },
-        colors: ['#DCE6EC'],
-      };
-
-      const sparkline3 = new ApexCharts(document.querySelector('#sparkline-3'), option_sparkline3);
-      sparkline3.render();
-    </script>
-    <!--end::Script-->
-    <script>
-  const visitors_chart_options = {
-    series: [
-      {
-        name: 'Visitors',
-        data: [100, 120, 170, 167, 180, 177, 160],
-      },
-    ],
-    chart: {
-      height: 200,
-      type: 'line',
-      toolbar: {
-        show: false,
-      },
-    },
-    colors: ['#0d6efd'],
-    stroke: {
-      curve: 'smooth',
-    },
-    grid: {
-      borderColor: '#e7e7e7',
-      row: {
-        colors: ['#f3f3f3', 'transparent'],
-        opacity: 0.5,
-      },
-    },
-    legend: {
-      show: false,
-    },
-    markers: {
-      size: 1,
-    },
-    xaxis: {
-      categories: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-    },
-  };
-
-  const visitors_chart = new ApexCharts(
-    document.querySelector('#visitors-chart'),
-    visitors_chart_options
-  );
-  visitors_chart.render();
-
-  const sales_chart_options = {
-  series: [
-    {
-      name: 'Leads',
-      data: [14, 18, 24, 9, 6],
-    },
-  ],
-  chart: {
-    type: 'bar',
-    height: 250,
-    toolbar: {
-      show: false,
-    },
-  },
-  plotOptions: {
-    bar: {
-      horizontal: false,
-      columnWidth: '45%',
-      borderRadius: 6,
-      distributed: true // ✅ important for multiple colors
-    },
-  },
-  legend: {
-    show: false,
-  },
-  colors: ['#0d6efd', '#20c997', '#ffc107', '#dc3545', '#6f42c1'], // ✅ 5 colors
-  dataLabels: {
-    enabled: false,
-  },
-  stroke: {
-    show: false,
-  },
-  xaxis: {
-    categories: ['Meta Ads', 'Google', 'Organic', 'TikTok', 'Referral'],
-  },
-  yaxis: {
-    title: {
-      text: 'Leads by Channel',
-    },
-  },
-  fill: {
-    opacity: 1,
-  },
-  tooltip: {
-    y: {
-      formatter: function (val) {
-        return val + ' leads';
-      },
-    },
-  },
-};
-
-  const sales_chart = new ApexCharts(
-    document.querySelector('#sales-chart'),
-    sales_chart_options
-  );
-  sales_chart.render();
-</script>
-<script>
- const cashflow_chart_options = {
-  series: [
-    {
-      name: 'Cash In',
-      data: [12000, 18000, 15000, 23000],
-    },
-    {
-      name: 'Cash Out',
-      data: [8000, 12000, 10000, 9500],
-    }
-  ],
-  chart: {
-    type: 'line',
-    height: 300,
-    toolbar: { show: false }
-  },
-  colors: ['#198754', '#dc3545'],
-  stroke: { curve: 'smooth', width: 3 },
-  xaxis: {
-    categories: ['Week 1', 'Week 2', 'Week 3', 'Week 4']
-  },
-  tooltip: {
-    y: {
-      formatter: val => '£' + val
-    }
-  }
-};
-
-new ApexCharts(document.querySelector("#cashflow-chart"), cashflow_chart_options).render();
-</script>
+    <script src="./js/account_ui.js"></script>
+   
 
   </body>
   <!--end::Body-->

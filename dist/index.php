@@ -95,6 +95,7 @@
     <div class="app-wrapper">
       <!--begin::Header-->
       <nav class="app-header navbar navbar-expand bg-body">
+        
         <!--begin::Container-->
         <div class="container-fluid">
           <li class="nav-item">
@@ -102,9 +103,17 @@
                 <i class="bi bi-list"></i>
               </a>
             </li>
-          <ul class="navbar-nav ms-auto">
-            
-      
+          <ul class="navbar-nav ms-auto align-items-center">
+
+          <!-- ✅ ACCOUNT SWITCHER -->
+          <li class="nav-item me-3">
+            <select id="accountSwitcher" class="form-select form-select-sm">
+              <option value="bcf">Ballycastle Climbing Frames</option>
+              <option value="bgr">Bespoke Garden Rooms</option>
+              <option value="bwd">Bespoke Window & Door Systems</option>
+              <option value="all">🌐 All Accounts (CEO View)</option>
+            </select>
+          </li>      
             <li class="nav-item dropdown user-menu">
               <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
                 <img
@@ -114,14 +123,14 @@
                 />
                 <span class="d-none d-md-inline">Nicola Graham</span>
               </a>
-              <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-
-                <li class="user-footer">
-                  <a href="#" class="btn btn-default btn-flat">Profile</a>
-                  <a href="./api/logout.php" class="btn btn-default btn-flat float-end">Sign out</a>
-                </li>
-                <!--end::Menu Footer-->
-              </ul>
+              <ul class="dropdown-menu dropdown-menu-end p-2" style="min-width: 180px;">
+              <li>
+                <a href="./api/logout.php" class="dropdown-item text-danger d-flex align-items-center">
+                  <i class="bi bi-box-arrow-right me-2"></i>
+                  Sign out
+                </a>
+              </li>
+            </ul>
             </li>
             <!--end::User Menu Dropdown-->
           </ul>
@@ -137,14 +146,11 @@
           <!--begin::Brand Link-->
           <a href="./index.html" class="brand-link">
             <!--begin::Brand Image-->
-            <img
-              src="./assets/img/bcf.png"
-              alt="BCF Logo"
-              class="brand-image opacity-75 shadow"
-            />
+            <img id="accountLogo" src="./assets/img/bcf.png" alt="Logo" class="brand-image">
             <!--end::Brand Image-->
             <!--begin::Brand Text-->
-            <span class="brand-text fw-light">Admin</span>
+            <span id="accountName" class="brand-text fw-light">BCF</span>
+            
             <!--end::Brand Text-->
           </a>
           <!--end::Brand Link-->
@@ -337,7 +343,7 @@
                 <!--begin::Small Box Widget 3-->
                 <div class="small-box" style="background-color:#198754; color:#fff;">
                   <div class="inner">
-                    <h3>£123,000</h3>
+                    <h3>£0</h3>
                     <p>Revenue</p>
                   </div>
                   <svg
@@ -362,7 +368,7 @@
                 <!--begin::Small Box Widget 3-->
                 <div class="small-box text-bg-primary">
                   <div class="inner">
-                    <h3 id="kpi-active">0</h3>
+                    <h3>0</h3>
                     <p>Active Projects</p>
                   </div>
                   <svg
@@ -387,7 +393,7 @@
                 <!--begin::Small Box Widget 4-->
                 <div class="small-box text-bg-danger">
                   <div class="inner">
-                    <h3>65</h3>
+                    <h3>0</h3>
                     <p>Outstanding Invoices</p>
                   </div>
                   <svg
@@ -459,16 +465,17 @@
       <!--end::App Main-->
       <!--begin::Footer-->
       <footer class="app-footer">
-        <!--begin::To the end-->
-        <div class="float-end d-none d-sm-inline">Anything you want</div>
-        <!--end::To the end-->
-        <!--begin::Copyright-->
+        <!-- Right side -->
+        <div class="float-end d-none d-sm-inline">
+          v1.0
+        </div>
+
+        <!-- Left side -->
         <strong>
-          Footer -- -- &nbsp;
-          <a href="https://adminlte.io" class="text-decoration-none">BalleyCastleTestUI</a>.
+          © <?php echo date('Y'); ?>
+          <a href="#" class="text-decoration-none">Ballycastle Admin Dashboard</a>.
         </strong>
         All rights reserved.
-        <!--end::Copyright-->
       </footer>
       <!--end::Footer-->
     </div>
@@ -491,255 +498,83 @@
     ></script>
     <!--end::Required Plugin(Bootstrap 5)--><!--begin::Required Plugin(AdminLTE)-->
     <script src="./js/adminlte.js"></script>
-    <!--end::Required Plugin(AdminLTE)--><!--begin::OverlayScrollbars Configure-->
+    
+    <script src="./js/account_ui.js"></script>
     <script>
+// ==============================
+// 🔥 MAIN REFRESH
+// ==============================
+function refreshPageData() {
+  loadDashboardData();
+  loadSecurityData();
+}
+
+// ==============================
+// 📊 DASHBOARD
+// ==============================
 let isLoading = false;
+
+function getAccount() {
+  return localStorage.getItem('account') || 'bcf';
+}
 
 async function loadDashboardData() {
   if (isLoading) return;
   isLoading = true;
 
   try {
-    // ✅ prevent caching (VERY IMPORTANT)
-    const response = await fetch('api/get_pipeline.php?_=' + new Date().getTime());
+    const account = getAccount();
+
+    const response = await fetch(
+      `api/get_pipeline.php?account=${account}&_=` + Date.now()
+    );
 
     const data = await response.json();
 
-    console.log("REFRESHED DATA:", data);
-
-    // Update UI
-    document.getElementById('kpi-leads').innerText = data.weekly_leads;
-    document.getElementById('kpi-closed').innerText = data.closed_sales;
+    document.getElementById('kpi-leads').innerText = data.weekly_leads || 0;
+    document.getElementById('kpi-closed').innerText = data.closed_sales || 0;
     document.getElementById('kpi-pipeline').innerText =
-      "£" + Number(data.pipeline_value).toLocaleString();
+      "£" + Number(data.pipeline_value || 0).toLocaleString();
 
   } catch (error) {
-    console.error("Error loading dashboard:", error);
+    console.error("Dashboard error:", error);
   }
 
   isLoading = false;
 }
 
-// ✅ Initial load
-loadDashboardData();
 
-// ✅ Auto refresh every 10s
-setInterval(() => {
-  console.log("⏱ Refresh triggered...");
-  loadDashboardData();
-}, 10000);
-</script>
- <script>
-const SHEET_URL = "https://opensheet.elk.sh/1t-DzS_uln-2JrXvqwawU_g2UVepmVPIZ8sCCO-ng_LU/API";
-
-async function loadProjects() {
-  try {
-    const res = await fetch(SHEET_URL);
-    const data = await res.json();
-
-    console.log("PROJECT DATA:", data);
-
-    if (!Array.isArray(data)) {
-      console.error("Invalid API response", data);
-      return;
-    }
-
-    // ==========================
-    // KPI CALCULATION (UPDATED)
-    // ==========================
-    const total = data.length;
-
-    const active = data.filter(p => 
-      (p.status || "").toLowerCase() === "active"
-    ).length;
-
-    const completed = data.filter(p => 
-      (p.status || "").toLowerCase() === "completed"
-    ).length;
-
-    const pending = data.filter(p => 
-      (p.status || "").toLowerCase() === "on hold" ||
-      (p.status || "").toLowerCase() === "pending"
-    ).length;
-
-    // SAFE UPDATE
-    const setText = (id, value) => {
-      const el = document.getElementById(id);
-      if (el) el.innerText = value;
-    };
-
-    setText("kpi-total", total);
-    setText("kpi-active", active);
-    setText("kpi-completed", completed);
-    setText("kpi-pending", pending);
-
-    // ==========================
-    // TABLE (keep your existing)
-    // ==========================
-    const table = document.getElementById("projects-table-body");
-    if (!table) return;
-
-    table.innerHTML = "";
-
-    data.forEach(p => {
-      const progress = parseInt(p.progress) || 0;
-
-      table.innerHTML += `
-        <tr class="${p.delay === "Yes" ? 'table-danger' : ''}">
-          <td>${p.client}</td>
-          <td>${p.project}</td>
-          <td><span class="badge bg-primary">${p.stage}</span></td>
-          <td>
-            <div class="progress">
-              <div class="progress-bar ${progress < 40 ? 'bg-danger' : progress < 70 ? 'bg-warning' : 'bg-success'}" 
-                   style="width:${progress}%">
-                ${progress}%
-              </div>
-            </div>
-          </td>
-          <td>${p.next_update || '-'}</td>
-          <td>${p.delay === "Yes" ? '<span class="badge bg-danger">Delayed</span>' : '<span class="badge bg-success">No</span>'}</td>
-          <td><span class="badge bg-success">${p.site_visit}</span></td>
-        </tr>
-      `;
-    });
-
-  } catch (err) {
-    console.error("Projects error:", err);
-  }
-}
-
-// LOAD
-document.addEventListener("DOMContentLoaded", function () {
-  loadProjects();
-  setInterval(loadProjects, 60000);
-});
-</script>
-<script>
-let systemChart;
-let complianceChart;
-
+// ==============================
+// 🔐 SECURITY
+// ==============================
 async function loadSecurityData() {
   try {
-    const res = await fetch('api/get_security.php');
+    const account = getAccount();
+
+    const res = await fetch(
+      `api/get_security.php?account=${account}&_=` + Date.now()
+    );
+
     const data = await res.json();
 
-    console.log("SECURITY DATA:", data);
-
-    // ==========================
-    // KPI CARDS
-    // ==========================
     const setText = (id, value) => {
       const el = document.getElementById(id);
       if (el) el.innerText = value;
     };
 
-    setText('kpi-domains', data.domains);
-    setText('kpi-ssl', data.ssl_healthy);
-    setText('kpi-mfa', data.mfa);
-    setText('kpi-email', data.email_health);
-    setText('kpi-backups', data.backups);
-    setText('kpi-alerts', data.alerts);
-
-    // ==========================
-    // SYSTEM HEALTH CHART
-    // ==========================
-    const systemEl = document.querySelector("#system-health-chart");
-
-    if (systemEl) {
-      const systemData = [
-        data.system_health.healthy,
-        data.system_health.warning,
-        data.system_health.critical
-      ];
-
-      if (systemChart) {
-        systemChart.updateSeries(systemData);
-      } else {
-        systemChart = new ApexCharts(systemEl, {
-          series: systemData,
-          chart: { type: 'donut', height: 280 },
-          labels: ['Healthy', 'Warning', 'Critical'],
-          colors: ['#198754', '#ffc107', '#dc3545']
-        });
-
-        systemChart.render();
-      }
-    }
-
-    // ==========================
-    // COMPLIANCE CHART
-    // ==========================
-    const complianceEl = document.querySelector("#security-chart");
-
-    if (complianceEl) {
-      const complianceData = [
-        data.compliance.mfa,
-        data.compliance.backups,
-        data.compliance.dns,
-        data.compliance.ssl
-      ];
-
-      if (complianceChart) {
-        complianceChart.updateSeries([{ data: complianceData }]);
-      } else {
-        complianceChart = new ApexCharts(complianceEl, {
-          series: [{ data: complianceData }],
-          chart: { type: 'bar', height: 300 },
-          xaxis: {
-            categories: ['MFA', 'Backups', 'DNS', 'SSL']
-          },
-          colors: ['#ffc107', '#198754', '#0d6efd', '#20c997']
-        });
-
-        complianceChart.render();
-      }
-    }
-
-    // ==========================
-    // TABLE (🔥 THIS WAS MISSING)
-    // ==========================
-    const table = document.getElementById('security-table-body');
-
-    if (table && data.domains_list) {
-      table.innerHTML = '';
-
-      data.domains_list.forEach(domain => {
-
-        const badge = (ok) =>
-          ok
-            ? '<span class="badge bg-success">OK</span>'
-            : '<span class="badge bg-danger">Missing</span>';
-
-        const statusBadge = domain.ssl
-          ? '<span class="badge bg-success">Healthy</span>'
-          : '<span class="badge bg-danger">Issue</span>';
-
-        table.innerHTML += `
-          <tr>
-            <td>${domain.name}</td>
-            <td>Domain</td>
-            <td>${statusBadge}</td>
-            <td>${badge(domain.spf)}</td>
-            <td>${badge(domain.dkim)}</td>
-            <td>${badge(domain.dmarc)}</td>
-            <td>Today</td>
-            <td>${domain.ssl ? 'Secure' : 'SSL Issue'}</td>
-          </tr>
-        `;
-      });
-    }
+    setText('kpi-domains', data.domains || 0);
+    setText('kpi-ssl', data.ssl_healthy || 0);
+    setText('kpi-mfa', data.mfa || 0);
 
   } catch (error) {
-    console.error("Dashboard Error:", error);
+    console.error("Security error:", error);
   }
 }
-
-// ==========================
-// LOAD + AUTO REFRESH
-// ==========================
-loadSecurityData();
-setInterval(loadSecurityData, 60000);
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(() => {
+    refreshPageData();
+  }, 200);
+});
 </script>
     <!--end::Script-->
   </body>

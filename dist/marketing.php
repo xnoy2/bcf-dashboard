@@ -71,6 +71,17 @@
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+      .card-body {
+        min-height: 350px;
+      }
+
+      #weekly-marketing-chart,
+      #lead-sources-chart {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
   </head>
   <!--end::Head-->
   <!--begin::Body-->
@@ -98,14 +109,14 @@
                 />
                 <span class="d-none d-md-inline">Nicola Graham</span>
               </a>
-              <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-
-                <li class="user-footer">
-                  <a href="#" class="btn btn-default btn-flat">Profile</a>
-                  <a href="./api/logout.php" class="btn btn-default btn-flat float-end">Sign out</a>
-                </li>
-                <!--end::Menu Footer-->
-              </ul>
+              <ul class="dropdown-menu dropdown-menu-end p-2" style="min-width: 180px;">
+              <li>
+                <a href="./api/logout.php" class="dropdown-item text-danger d-flex align-items-center">
+                  <i class="bi bi-box-arrow-right me-2"></i>
+                  Sign out
+                </a>
+              </li>
+            </ul>
             </li>
             <!--end::User Menu Dropdown-->
           </ul>
@@ -119,16 +130,13 @@
         <!--begin::Sidebar Brand-->
         <div class="sidebar-brand">
           <!--begin::Brand Link-->
-          <a href="./index.html" class="brand-link">
+          <a href="./index.php" class="brand-link">
             <!--begin::Brand Image-->
-            <img
-              src="./assets/img/bcf.png"
-              alt="BCF Logo"
-              class="brand-image opacity-75 shadow"
-            />
+            <img id="accountLogo" src="./assets/img/bcf.png" alt="Logo" class="brand-image">
             <!--end::Brand Image-->
             <!--begin::Brand Text-->
-            <span class="brand-text fw-light">Admin</span>
+            <span id="accountName" class="brand-text fw-light">BCF</span>
+            
             <!--end::Brand Text-->
           </a>
           <!--end::Brand Link-->
@@ -323,7 +331,7 @@
                     <div class="row">
                       <div class="col-md-12" >
                         <p class="text-center">
-                          <strong>Leads :</strong>
+                          <strong>Leads by Source</strong>
                         </p>
                         <div id="sales-chart" ></div>
                       </div>
@@ -338,16 +346,17 @@
             </div>
             <!--end::Row-->
             <!--begin::Row-->
-            <div class="row">
-              <div class="col-md-6">
-                <div class="card mb-4">
+            <div class="row g-3 align-items-stretch">
+              <div class="col-md-6 d-flex">
+                <div class="card mb-4 w-100 h-100">
                   <div class="card-header border-0">
                     <div class="d-flex justify-content-between">
                       <h3 class="card-title">Weekly Marketing Performance</h3>
                       <a
-                        href="javascript:void(0);"
-                        class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
-                      >
+                      href="https://app.gohighlevel.com/v2/location/GSxspezlKiWYWE604ot9/dashboard"
+                      target="_blank"
+                      class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
+                    >
                         View Report
                       </a>
                     </div>
@@ -360,9 +369,8 @@
                         <span>Total Leads This Week</span>
                       </p>
                       <p class="ms-auto d-flex flex-column text-end">
-                        <span class="text-success">
-                          <i class="bi bi-arrow-up" id="kpi-leads-percent"></i>
-                        </span>
+                        <span id="kpi-leads-percent"></span>
+                        
                         <span class="text-secondary">Since Last Week</span>
                       </p>
                     </div>
@@ -374,15 +382,16 @@
                 </div>
               </div>
 
-              <div class="col-lg-6 connectedSortable">
-                <div class="card mb-4">
+              <div class="col-md-6 d-flex">
+                <div class="card mb-4 w-100 h-100">
             <div class="card-header border-0">
                 <div class="d-flex justify-content-between">
                 <h3 class="card-title">Traffic Sources</h3>
                 <a
-                    href="javascript:void(0);"
-                    class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
-                >
+                      href="https://app.gohighlevel.com/v2/location/GSxspezlKiWYWE604ot9/dashboard"
+                      target="_blank"
+                      class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
+                    >
                     View Report
                 </a>
                 </div>
@@ -395,9 +404,7 @@
                     <span>Website Traffic</span>
                 </p>
                 <p class="ms-auto d-flex flex-column text-end">
-                    <span class="text-success">
-                    <i class="bi bi-arrow-up" id="kpi-traffic-percent"></i>
-                    </span>
+                    <span id="kpi-traffic-percent"></span>
                     <span class="text-secondary">Since Last Week</span>
                 </p>
                 </div>
@@ -419,16 +426,17 @@
       <!--end::App Main-->
       <!--begin::Footer-->
       <footer class="app-footer">
-        <!--begin::To the end-->
-        <div class="float-end d-none d-sm-inline">Anything you want</div>
-        <!--end::To the end-->
-        <!--begin::Copyright-->
+        <!-- Right side -->
+        <div class="float-end d-none d-sm-inline">
+          v1.0
+        </div>
+
+        <!-- Left side -->
         <strong>
-          Footer -- -- &nbsp;
-          <a href="https://adminlte.io" class="text-decoration-none">BalleyCastleTestUI</a>.
+          © <?php echo date('Y'); ?>
+          <a href="#" class="text-decoration-none">Ballycastle Admin Dashboard</a>.
         </strong>
         All rights reserved.
-        <!--end::Copyright-->
       </footer>
       <!--end::Footer-->
     </div>
@@ -470,7 +478,33 @@
       crossorigin="anonymous"
     ></script>
     <!-- ChartJS -->
+    <script src="./js/account_ui.js"></script>
    <script>
+// ==============================
+// 🔥 MAIN REFRESH FUNCTION
+// ==============================
+function refreshPageData() {
+  loadMarketingData();
+}
+
+// ==============================
+// ✅ ACCOUNT HELPER
+// ==============================
+function getAccount() {
+  return localStorage.getItem('account') || 'bcf';
+}
+
+const SOURCE_COLORS = {
+  "Meta Ads": "#0d6efd",     // Blue
+  "Google": "#198754",       // Green
+  "Organic": "#f59e0b",      // Orange
+  "TikTok": "#ef4444",       // Red
+  "Referral": "#8b5cf6"      // Purple
+};
+
+// ==============================
+// 📊 MARKETING LOGIC
+// ==============================
 let chartMain, chartWeekly, chartSources;
 let isLoading = false;
 
@@ -479,7 +513,10 @@ async function loadMarketingData() {
   isLoading = true;
 
   try {
-    const res = await fetch('api/get_pipeline.php?_=' + Date.now());
+    const res = await fetch(
+      `api/get_pipeline.php?account=${getAccount()}&_=` + Date.now()
+    );
+
     const data = await res.json();
 
     console.log("MARKETING DATA:", data);
@@ -491,94 +528,215 @@ async function loadMarketingData() {
     const google = sources["Google"] || 0;
     const tiktok = sources["TikTok"] || 0;
     const organic = sources["Organic"] || 0;
+    const referral = sources["Referral"] || 0;
 
-    const totalLeads = meta + google + tiktok + organic;
+    // 🔥 TOTAL (FIXED)
+    const totalLeads = meta + google + tiktok + organic + referral;
 
-    // Fake spend logic (replace later with real API if available)
     const adSpend = totalLeads * 15;
     const cpl = totalLeads > 0 ? (adSpend / totalLeads) : 0;
 
-    document.getElementById("kpi-adspend").innerText = "£" + adSpend.toLocaleString();
-    document.getElementById("kpi-cpl").innerText = "£" + cpl.toFixed(2);
-    document.getElementById("kpi-meta").innerText = meta;
-    document.getElementById("kpi-google").innerText = google;
-    document.getElementById("kpi-tiktok").innerText = tiktok;
-    document.getElementById("kpi-organic").innerText = organic;
+    const setText = (id, value) => {
+      const el = document.getElementById(id);
+      if (el) el.innerText = value;
+    };
 
-    // ================= MAIN BAR CHART (FIXED) =================
-    if (chartMain) chartMain.destroy();
+    setText("kpi-adspend", "£" + adSpend.toLocaleString());
+    setText("kpi-cpl", "£" + cpl.toFixed(2));
+    setText("kpi-meta", meta);
+    setText("kpi-google", google);
+    setText("kpi-tiktok", tiktok);
+    setText("kpi-organic", organic);
 
-    chartMain = new ApexCharts(document.querySelector("#sales-chart"), {
-      chart: { type: "bar", height: 300 },
-      series: [{
-        name: "Leads",
-        data: [meta, google, organic, tiktok]
-      }],
-      xaxis: {
-        categories: ["Meta Ads", "Google", "Organic", "TikTok"]
-      },
-      plotOptions: {
-        bar: {
-          distributed: true
-        }
-      }
-    });
+    // ================= MAIN BAR CHART =================
+const mainEl = document.querySelector("#sales-chart");
 
-    chartMain.render();
+if (mainEl) {
+  if (chartMain) chartMain.destroy();
+
+  const categories = ["Meta Ads", "Google", "Organic", "TikTok", "Referral"];
+
+  const values = categories.map(c => sources[c] || 0);
+  const colors = categories.map(c => SOURCE_COLORS[c]);
+
+  chartMain = new ApexCharts(mainEl, {
+    chart: { type: "bar", height: 300 },
+    series: [{
+      name: "Leads",
+      data: values
+    }],
+    xaxis: {
+      categories: categories
+    },
+    colors: colors, // ✅ FIXED COLOR MAPPING
+    plotOptions: {
+      bar: { distributed: true }
+    }
+  });
+
+  chartMain.render();
+}
 
     // ================= WEEKLY KPI =================
-    const weeklyLeads = data.weekly_leads || 0;
-    const lastWeek = data.last_week_leads || 0;
+   const weeklyLeads = data.weekly_leads || 0;
+  const lastWeek = data.last_week_leads || 0;
 
-    let percent = lastWeek > 0
-      ? ((weeklyLeads - lastWeek) / lastWeek) * 100
-      : 0;
+  let percent = lastWeek > 0
+    ? ((weeklyLeads - lastWeek) / lastWeek) * 100
+    : 0;
 
-    percent = percent.toFixed(1);
+  percent = percent.toFixed(1);
 
-    const leadsText = document.querySelector(".card-body .fw-bold");
-    const percentText = document.querySelector(".card-body .text-success, .card-body .text-danger");
+  // ✅ CORRECT ELEMENT TARGETING
+  const leadsText = document.getElementById("kpi-leads-week");
+  const percentText = document.getElementById("kpi-leads-percent");
 
-    if (leadsText) leadsText.innerText = weeklyLeads;
-    if (percentText) {
-      percentText.innerText = (percent >= 0 ? "↑ " : "↓ ") + Math.abs(percent) + "%";
-      percentText.className = percent >= 0 ? "text-success" : "text-danger";
+  // ✅ UPDATE VALUES
+  if (leadsText) {
+    leadsText.innerText = weeklyLeads;
+  }
+
+  if (percentText) {
+    percentText.innerHTML =
+      `${percent >= 0 ? "↑" : "↓"} ${Math.abs(percent)}%`;
+
+    percentText.className =
+      percent >= 0 ? "text-success" : "text-danger";
+  }
+
+    // ================= TRAFFIC KPI =================
+    const trafficTotal = totalLeads;
+
+    const trafficEl = document.getElementById("kpi-traffic");
+    const trafficPercentEl = document.getElementById("kpi-traffic-percent");
+
+    if (trafficEl) {
+      trafficEl.innerText = trafficTotal;
     }
 
-    // ================= WEEKLY CHART (USE FULL DATA) =================
-    if (chartWeekly) chartWeekly.destroy();
+    if (trafficPercentEl) {
+      trafficPercentEl.innerHTML =
+        `${percent >= 0 ? "↑" : "↓"} ${Math.abs(percent)}%`;
 
-    chartWeekly = new ApexCharts(document.querySelector("#weekly-marketing-chart"), {
-      chart: { type: "line", height: 300 },
-      series: [{
-        name: "Leads",
-        data: data.weekly_trend || []
-      }],
-      xaxis: {
-        categories: data.weekly_labels || []
+      trafficPercentEl.className =
+        percent >= 0 ? "text-success" : "text-danger";
+    }
+
+   // ================= WEEKLY CHART (CEO FRIENDLY) =================
+const weeklyEl = document.querySelector("#weekly-marketing-chart");
+
+if (weeklyEl) {
+  if (chartWeekly) chartWeekly.destroy();
+
+  const rawData = data.weekly_trend || [];
+
+  // 🔥 GROUP DAILY → WEEKLY
+  const weeklyGrouped = [];
+  for (let i = 0; i < rawData.length; i += 7) {
+    const chunk = rawData.slice(i, i + 7);
+    const sum = chunk.reduce((a, b) => a + b, 0);
+    weeklyGrouped.push(sum);
+  }
+
+  // 🔥 LIMIT TO LAST 12 WEEKS
+  const lastWeeks = weeklyGrouped.slice(-12);
+
+  // 🔥 LABELS
+  const labels = lastWeeks.map((_, i) => `Week ${i + 1}`);
+
+  // 🔥 AVERAGE LINE
+  const avg =
+    lastWeeks.reduce((a, b) => a + b, 0) / lastWeeks.length;
+
+  chartWeekly = new ApexCharts(weeklyEl, {
+    chart: {
+      type: "area",
+      height: 300,
+      toolbar: { show: false }
+    },
+
+    series: [{
+      name: "Leads",
+      data: lastWeeks
+    }],
+
+    xaxis: {
+      categories: labels
+    },
+
+    stroke: {
+      curve: "smooth",
+      width: 3
+    },
+
+    fill: {
+      type: "gradient",
+      gradient: {
+        opacityFrom: 0.4,
+        opacityTo: 0.05
       }
-    });
+    },
 
-    chartWeekly.render();
+    markers: {
+      size: 4
+    },
+
+    yaxis: {
+      labels: {
+        formatter: val => Math.round(val)
+      }
+    },
+
+    annotations: {
+      yaxis: [{
+        y: avg,
+        borderColor: "#dc3545",
+        label: {
+          text: "Avg",
+          style: {
+            background: "#dc3545",
+            color: "#fff"
+          }
+        }
+      }]
+    },
+
+    tooltip: {
+      y: {
+        formatter: val => `${val} leads`
+      }
+    }
+  });
+
+  chartWeekly.render();
+}
 
     // ================= DONUT CHART =================
-    if (chartSources) chartSources.destroy();
+    // ================= DONUT CHART =================
+const sourceEl = document.querySelector("#lead-sources-chart");
 
-    const total = Object.values(sources).reduce((a, b) => a + b, 0);
+if (sourceEl) {
+  if (chartSources) chartSources.destroy();
 
-    chartSources = new ApexCharts(document.querySelector("#lead-sources-chart"), {
-      chart: { type: "donut", height: 280 },
-      series: Object.values(sources),
-      labels: Object.keys(sources),
-      legend: { position: "bottom" },
-      dataLabels: {
-        formatter: function (val) {
-          return val.toFixed(1) + "%";
-        }
+  const sourceLabels = Object.keys(sources);
+  const sourceValues = sourceLabels.map(l => sources[l]);
+  const sourceColors = sourceLabels.map(l => SOURCE_COLORS[l] || "#ccc");
+
+  chartSources = new ApexCharts(sourceEl, {
+    chart: { type: "donut", height: 280 },
+    series: sourceValues,
+    labels: sourceLabels,
+    colors: sourceColors, // ✅ SAME COLORS AS BAR
+    legend: { position: "bottom" },
+    dataLabels: {
+      formatter: function (val) {
+        return val.toFixed(1) + "%";
       }
-    });
+    }
+  });
 
-    chartSources.render();
+  chartSources.render();
+}
 
   } catch (err) {
     console.error("MARKETING ERROR:", err);
@@ -587,12 +745,14 @@ async function loadMarketingData() {
   isLoading = false;
 }
 
+// ==============================
+// 🔥 LOAD TRIGGER (IMPORTANT)
+// ==============================
 document.addEventListener("DOMContentLoaded", () => {
-  loadMarketingData();
-  setInterval(loadMarketingData, 60000);
+  refreshPageData();
+  setInterval(refreshPageData, 60000);
 });
 </script>
-
   </body>
   <!--end::Body-->
 </html>
