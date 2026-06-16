@@ -108,6 +108,18 @@
                             <i class="nav-icon bi bi-speedometer2"></i><p>CEO Overview</p>
                         </a>
                     </li>
+                    @php
+                        try {
+                            $calUrgent = \App\Models\CalendarEntry::overdue()->count()
+                                + \App\Models\CalendarEntry::dueWithin(2)->count();
+                        } catch (\Throwable $e) { $calUrgent = 0; }
+                    @endphp
+                    <li class="nav-item">
+                        <a href="{{ route('calendar') }}" class="nav-link {{ request()->routeIs('calendar') ? 'active' : '' }}">
+                            <i class="nav-icon bi bi-calendar3"></i>
+                            <p>Calendar @if($calUrgent)<span class="badge text-bg-danger ms-1">{{ $calUrgent }}</span>@endif</p>
+                        </a>
+                    </li>
                     <li class="nav-header text-uppercase small text-secondary mt-2">Growth</li>
                     <li class="nav-item">
                         <a href="{{ route('sales') }}" class="nav-link {{ request()->routeIs('sales') ? 'active' : '' }}">

@@ -17,3 +17,7 @@ Schedule::command('dashboard:warm')
 // Daily domain-expiry alert email (window set by RENEWAL_ALERT_DAYS).
 Schedule::command('renewals:notify')
     ->dailyAt('08:00');
+
+// Daily calendar reminder — overdue jobs + jobs entering their reminder window.
+Schedule::command('calendar:remind')
+    ->dailyAt('07:30');
