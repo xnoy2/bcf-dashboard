@@ -41,8 +41,21 @@ class GhlService
             }
 
             $ghl = $accounts[$account]['ghl'];
-            return $this->processAccount($ghl['api_key'], $ghl['location_id']);
+            return $this->processAccount($ghl['api_key'], $ghl['location_id'], $this->priorityPipeline($account));
         });
+    }
+
+    /**
+     * When a contact has opportunities in several pipelines, the Lead Explorer
+     * keeps just one row — the one in this "progress" pipeline for the account.
+     * Matched case-insensitively as a substring (e.g. "BCF Build Progress").
+     */
+    private function priorityPipeline(string $account): ?string
+    {
+        return [
+            'bcf' => 'Build Progress',
+            'bgr' => 'Project Progress',
+        ][$account] ?? null;
     }
 
     private function combined(array $accounts): array
@@ -53,7 +66,7 @@ class GhlService
         $stages = $sources = $trend = [];
 
         foreach ($accounts as $key => $acc) {
-            $data = $this->processAccount($acc['ghl']['api_key'], $acc['ghl']['location_id']);
+            $data = $this->processAccount($acc['ghl']['api_key'], $acc['ghl']['location_id'], $this->priorityPipeline($key));
 
             foreach (['weekly_leads', 'new_leads', 'pipeline_value', 'closed_sales', 'revenue', 'quotes_issued', 'last_week_leads', 'open_count', 'won_count', 'lost_count'] as $k) {
                 $final[$k] += $data[$k] ?? 0;
@@ -109,7 +122,7 @@ class GhlService
         return $final;
     }
 
-    private function processAccount(?string $apiKey, ?string $locationId): array
+    private function processAccount(?string $apiKey, ?string $locationId, ?string $priorityPipeline = null): array
     {
         if (! $apiKey || ! $locationId) {
             return $this->emptySummary();
@@ -118,7 +131,9 @@ class GhlService
         $pipelines = $this->fetchPipelines($apiKey, $locationId);
 
         $stageMap = [];
+        $pipelineNames = [];
         foreach ($pipelines as $pl) {
+            $pipelineNames[$pl['id']] = $pl['name'];
             foreach ($pl['stages'] as $s) {
                 $stageMap[$s['id']] = $s['name'];
             }
@@ -130,7 +145,7 @@ class GhlService
             return $this->emptySummary();
         }
 
-        $summary = $this->aggregate($opportunities, $stageMap);
+        $summary = $this->aggregate($opportunities, $stageMap, $pipelineNames, $priorityPipeline);
 
         // Per-pipeline funnel: opportunity counts per stage, in stage order,
         // so the UI can show one pipeline at a time.
@@ -216,7 +231,7 @@ class GhlService
         return $all;
     }
 
-    private function aggregate(array $opportunities, array $stageMap): array
+    private function aggregate(array $opportunities, array $stageMap, array $pipelineNames = [], ?string $priorityPipeline = null): array
     {
         $summary = $this->emptySummary();
         $stages = $weeklyTrend = $leadSources = $leads = [];
@@ -261,14 +276,17 @@ class GhlService
             $leadSources[$source] = ($leadSources[$source] ?? 0) + 1;
 
             // Lightweight per-lead record for the drill-down explorer
-            // (short keys keep the cached payload small).
+            // (short keys keep the cached payload small). `cid`/`pl` are used
+            // only for de-duplication and stripped before the payload is stored.
             $leads[] = [
-                'n'  => $opp['name'] ?? ($opp['contact']['name'] ?? '—'),
-                's'  => $source,
-                'st' => $stageName,
-                'v'  => $value,
-                'd'  => $label,
-                'ts' => $createdAt,
+                'n'   => $opp['name'] ?? ($opp['contact']['name'] ?? '—'),
+                's'   => $source,
+                'st'  => $stageName,
+                'v'   => $value,
+                'd'   => $label,
+                'ts'  => $createdAt,
+                'cid' => $opp['contactId'] ?? ($opp['contact']['id'] ?? null),
+                'pl'  => $pipelineNames[$opp['pipelineId'] ?? ''] ?? '',
             ];
         }
 
@@ -287,10 +305,64 @@ class GhlService
         $summary['weekly_labels'] = array_keys($weeklyTrend);
         $summary['lead_sources']  = $leadSources;
 
+        // Collapse multiple opportunities for the same contact into one row,
+        // keeping the priority ("progress") pipeline where available.
+        $leads = $this->dedupeLeads($leads, $priorityPipeline);
+
         usort($leads, fn ($x, $y) => $y['ts'] <=> $x['ts']); // newest first
         $summary['leads'] = $leads;
 
         return $summary;
+    }
+
+    /**
+     * One row per contact. When a contact appears in several pipelines, prefer
+     * the record in $priorityPipeline (e.g. "Build Progress"); otherwise keep
+     * the most recent. Contacts without an id fall back to a name key.
+     */
+    private function dedupeLeads(array $leads, ?string $priorityPipeline): array
+    {
+        $groups = [];
+        foreach ($leads as $ld) {
+            $key = $ld['cid'] ?: ('name:' . mb_strtolower(trim((string) $ld['n'])));
+            $groups[$key][] = $ld;
+        }
+
+        $result = [];
+        foreach ($groups as $group) {
+            if (count($group) === 1) {
+                $result[] = $group[0];
+                continue;
+            }
+
+            $chosen = null;
+            // First choice: the newest record in the priority pipeline.
+            if ($priorityPipeline) {
+                foreach ($group as $g) {
+                    if ($g['pl'] !== '' && stripos($g['pl'], $priorityPipeline) !== false
+                        && ($chosen === null || $g['ts'] > $chosen['ts'])) {
+                        $chosen = $g;
+                    }
+                }
+            }
+            // Fallback: the newest record overall.
+            if ($chosen === null) {
+                foreach ($group as $g) {
+                    if ($chosen === null || $g['ts'] > $chosen['ts']) {
+                        $chosen = $g;
+                    }
+                }
+            }
+            $result[] = $chosen;
+        }
+
+        // Strip the de-dup helper keys so the cached payload stays lean.
+        foreach ($result as &$r) {
+            unset($r['cid'], $r['pl']);
+        }
+        unset($r);
+
+        return $result;
     }
 
     private function normaliseSource(string $source): string
