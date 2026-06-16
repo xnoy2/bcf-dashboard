@@ -26,9 +26,15 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-            return redirect()->intended(route('dashboard'));
+            $target = redirect()->intended(route('dashboard'))->getTargetUrl();
+
+            return $request->wantsJson()
+                ? response()->json(['ok' => true, 'redirect' => $target])
+                : redirect()->to($target);
         }
 
+        // For AJAX this returns a 422 with the message (no page reload);
+        // for a plain POST it redirects back with the error.
         throw ValidationException::withMessages([
             'email' => 'Invalid email or password.',
         ]);
