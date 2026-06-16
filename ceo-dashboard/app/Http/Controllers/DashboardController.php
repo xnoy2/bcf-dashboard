@@ -18,12 +18,18 @@ class DashboardController extends Controller
         $account  = $this->resolveAccount($request);
 
         // Calendar widget: overdue first, then the soonest upcoming jobs.
-        $calendar = CalendarEntry::query()
-            ->whereIn('status', ['scheduled', 'in_progress'])
-            ->where(fn ($q) => $q->overdue()->orWhere(fn ($w) => $w->dueWithin(30)))
-            ->orderByRaw('COALESCE(end_date, start_date) asc')
-            ->limit(8)
-            ->get();
+        // Guarded so the dashboard still loads if the calendar table is missing
+        // (e.g. during the window between a code deploy and running migrations).
+        try {
+            $calendar = CalendarEntry::query()
+                ->whereIn('status', ['scheduled', 'in_progress'])
+                ->where(fn ($q) => $q->overdue()->orWhere(fn ($w) => $w->dueWithin(30)))
+                ->orderByRaw('COALESCE(end_date, start_date) asc')
+                ->limit(8)
+                ->get();
+        } catch (\Throwable $e) {
+            $calendar = collect();
+        }
 
         return view('dashboard', array_merge(
             ['account' => $account, 'accounts' => $accounts, 'calendarJobs' => $calendar],
