@@ -30,6 +30,15 @@ return [
 
     'disks' => [
 
+        // Calendar uploads — served via an auth-checked controller route, not
+        // the public dir. On Railway, mount a persistent volume at
+        // /app/storage/app/calendar so files survive redeploys.
+        'calendar' => [
+            'driver' => 'local',
+            'root' => storage_path('app/calendar'),
+            'throw' => false,
+        ],
+
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),

@@ -292,11 +292,9 @@
             <h2 class="welcome">Welcome back</h2>
             <p class="welcome-sub">Sign in to your executive dashboard</p>
 
-            @if ($errors->any())
-                <div class="alert alert-danger py-2">{{ $errors->first() }}</div>
-            @endif
+            <div class="alert alert-danger py-2 {{ $errors->any() ? '' : 'd-none' }}" id="loginError">{{ $errors->first() ?: 'Invalid email or password.' }}</div>
 
-            <form method="POST" action="{{ route('login') }}">
+            <form method="POST" action="{{ route('login') }}" id="loginForm">
                 @csrf
                 <div class="mb-3 fld">
                     <label class="form-label" for="email">Email</label>
@@ -336,6 +334,35 @@
             };
             if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { go(); return; }
             setTimeout(go, 1650);
+        })();
+
+        // AJAX login — invalid credentials show inline, no page reload/splash replay.
+        (function () {
+            var form = document.getElementById('loginForm');
+            var errBox = document.getElementById('loginError');
+            var btn = form.querySelector('.btn-signin');
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                errBox.classList.add('d-none');
+                btn.disabled = true; btn.style.opacity = '.7';
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+                    body: new FormData(form),
+                }).then(async function (r) {
+                    if (r.ok) { var d = await r.json(); window.location = d.redirect || '{{ route('dashboard') }}'; return; }
+                    var d = await r.json().catch(function () { return {}; });
+                    errBox.textContent = (d.errors && d.errors.email) ? d.errors.email[0] : (d.message || 'Invalid email or password.');
+                    errBox.classList.remove('d-none');
+                    form.querySelector('[name=password]').value = '';
+                    form.querySelector('[name=password]').focus();
+                    btn.disabled = false; btn.style.opacity = '1';
+                }).catch(function () {
+                    errBox.textContent = 'Could not sign in. Please try again.';
+                    errBox.classList.remove('d-none');
+                    btn.disabled = false; btn.style.opacity = '1';
+                });
+            });
         })();
 
         // Gentle parallax: aurora orbs follow the mouse at different depths.

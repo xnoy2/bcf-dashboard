@@ -78,6 +78,45 @@
             </div>
         </div>
 
+        {{-- Calendar: upcoming jobs & urgent actions --}}
+        <div class="card mt-3">
+            <div class="card-header d-flex align-items-center">
+                <h3 class="card-title mb-0"><i class="bi bi-calendar3"></i> Upcoming Jobs &amp; Urgent Actions</h3>
+                <a href="{{ route('calendar') }}" class="ms-auto small">open calendar →</a>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <tbody>
+                        @forelse(($calendarJobs ?? []) as $j)
+                            @php
+                                $due = $j->dueDate(); $overdue = $j->isOverdue();
+                                $sc = ['scheduled'=>'info','in_progress'=>'warning','completed'=>'success','cancelled'=>'secondary'][$j->status] ?? 'secondary';
+                            @endphp
+                            <tr style="cursor:pointer" onclick="location.href='{{ route('calendar') }}'">
+                                <td style="width:90px" class="text-center">
+                                    @if($overdue)
+                                        <span class="badge text-bg-danger">{{ abs($due->diffInDays(now())) }}d overdue</span>
+                                    @elseif($due->isToday())
+                                        <span class="badge text-bg-warning">today</span>
+                                    @else
+                                        <span class="badge text-bg-light">in {{ (int) round(now()->diffInDays($due, false)) }}d</span>
+                                    @endif
+                                </td>
+                                <td>{{ $j->client_name }} @if($j->is_birthday)🎂@endif
+                                    <small class="text-muted d-block">{{ \Illuminate\Support\Str::limit($j->order_details ?: $j->address, 50) }}</small>
+                                </td>
+                                <td class="text-muted small">{{ $due->format('d M') }}</td>
+                                <td>{{ $j->assigned_to ?: '—' }}</td>
+                                <td><span class="badge text-bg-{{ $sc }} text-capitalize">{{ str_replace('_',' ',$j->status) }}</span></td>
+                            </tr>
+                        @empty
+                            <tr><td class="text-center text-muted py-3">No upcoming jobs. <a href="{{ route('calendar') }}">Add one →</a></td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         {{-- Charts --}}
         <div class="row g-3 mt-1">
             <div class="col-lg-3">
