@@ -316,22 +316,30 @@ class GhlService
     }
 
     /**
-     * One row per contact. When a contact appears in several pipelines, prefer
-     * the record in $priorityPipeline (e.g. "Build Progress"); otherwise keep
-     * the most recent. Contacts without an id fall back to a name key.
+     * One row per contact, with two collapsing passes:
+     *
+     *  1. Same GHL contact id across several pipelines → keep the record in
+     *     $priorityPipeline (e.g. "Build Progress") if present, else the newest.
+     *  2. The same person can exist as separate contact records (different ids):
+     *     one still in the sales pipeline, one already promoted to the progress
+     *     pipeline. When a name has any row in $priorityPipeline, that single
+     *     (newest progress) row wins and every other row for that name is dropped.
+     *
+     * Contacts without an id fall back to a name key in pass 1.
      */
     private function dedupeLeads(array $leads, ?string $priorityPipeline): array
     {
+        // --- Pass 1: collapse by contact id. ---
         $groups = [];
         foreach ($leads as $ld) {
             $key = $ld['cid'] ?: ('name:' . mb_strtolower(trim((string) $ld['n'])));
             $groups[$key][] = $ld;
         }
 
-        $result = [];
+        $rows = [];
         foreach ($groups as $group) {
             if (count($group) === 1) {
-                $result[] = $group[0];
+                $rows[] = $group[0];
                 continue;
             }
 
@@ -339,7 +347,7 @@ class GhlService
             // First choice: the newest record in the priority pipeline.
             if ($priorityPipeline) {
                 foreach ($group as $g) {
-                    if ($g['pl'] !== '' && stripos($g['pl'], $priorityPipeline) !== false
+                    if ($this->inPipeline($g['pl'], $priorityPipeline)
                         && ($chosen === null || $g['ts'] > $chosen['ts'])) {
                         $chosen = $g;
                     }
@@ -353,16 +361,66 @@ class GhlService
                     }
                 }
             }
-            $result[] = $chosen;
+            $rows[] = $chosen;
+        }
+
+        // --- Pass 2: collapse same-name records when a progress row exists. ---
+        if ($priorityPipeline) {
+            // Only collapse on a real name. Blank/placeholder names ("—") are
+            // not identities, so distinct unnamed leads must never be merged.
+            $nameKey = function ($r): string {
+                $name = mb_strtolower(trim((string) $r['n']));
+                return ($name === '' || $name === '—') ? '' : $name;
+            };
+
+            // Names that have at least one row in the priority pipeline.
+            $hasProgress = [];
+            foreach ($rows as $r) {
+                if (($name = $nameKey($r)) !== '' && $this->inPipeline($r['pl'], $priorityPipeline)) {
+                    $hasProgress[$name] = true;
+                }
+            }
+
+            $kept = [];
+            $progressIndex = []; // name => position of its kept progress row in $kept
+            foreach ($rows as $r) {
+                $name = $nameKey($r);
+
+                // No real name, or no progress row for this name → keep untouched.
+                if ($name === '' || ! isset($hasProgress[$name])) {
+                    $kept[] = $r;
+                    continue;
+                }
+                // A progress row exists for this name → drop non-progress rows.
+                if (! $this->inPipeline($r['pl'], $priorityPipeline)) {
+                    continue;
+                }
+                // Keep only the newest progress row per name.
+                if (isset($progressIndex[$name])) {
+                    if ($r['ts'] > $kept[$progressIndex[$name]]['ts']) {
+                        $kept[$progressIndex[$name]] = $r;
+                    }
+                } else {
+                    $progressIndex[$name] = count($kept);
+                    $kept[] = $r;
+                }
+            }
+            $rows = $kept;
         }
 
         // Strip the de-dup helper keys so the cached payload stays lean.
-        foreach ($result as &$r) {
+        foreach ($rows as &$r) {
             unset($r['cid'], $r['pl']);
         }
         unset($r);
 
-        return $result;
+        return $rows;
+    }
+
+    /** Case-insensitive substring match of a pipeline name (e.g. "Build Progress"). */
+    private function inPipeline(string $pipeline, string $needle): bool
+    {
+        return $pipeline !== '' && stripos($pipeline, $needle) !== false;
     }
 
     private function normaliseSource(string $source): string
