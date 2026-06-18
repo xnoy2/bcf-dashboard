@@ -42,6 +42,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Read-only integration API
+    |--------------------------------------------------------------------------
+    | A single static key (DASHBOARD_API_KEY) authorises external apps to read
+    | the same cached dashboard data over JSON at /api/v1/*. Leave the env var
+    | empty to disable the API entirely (every request then returns 503).
+    */
+    'api' => [
+        'key' => env('DASHBOARD_API_KEY'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | GoHighLevel
     |--------------------------------------------------------------------------
     */
