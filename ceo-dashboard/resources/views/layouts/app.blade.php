@@ -18,6 +18,10 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Roboto:wght@400;500;700&display=swap">
     {{-- Aubergine & Gold executive theme (must load after AdminLTE) --}}
     <link rel="stylesheet" href="{{ asset('css/executive.css') }}">
+    <style>
+        /* Vertically centre the dismiss (×) in thin (py-2) alert banners. */
+        .alert-dismissible .btn-close { top: 50%; right: .35rem; transform: translateY(-50%); padding: .6rem; }
+    </style>
     @stack('styles')
 </head>
 <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
@@ -118,6 +122,11 @@
                         <a href="{{ route('calendar') }}" class="nav-link {{ request()->routeIs('calendar') ? 'active' : '' }}">
                             <i class="nav-icon bi bi-calendar3"></i>
                             <p>Calendar @if($calUrgent)<span class="badge text-bg-danger ms-1">{{ $calUrgent }}</span>@endif</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('workspaces.index') }}" class="nav-link {{ request()->routeIs('workspaces.*', 'boards.*', 'members.*') ? 'active' : '' }}">
+                            <i class="nav-icon bi bi-columns-gap"></i><p>Boards</p>
                         </a>
                     </li>
                     <li class="nav-header text-uppercase small text-secondary mt-2">Growth</li>
@@ -236,6 +245,9 @@
     // user isn't mid-typing/filtering). Paired with the 5-minute background
     // data warm, changes made in the connected tools appear automatically.
     setInterval(function () {
+        // Pages that manage their own live state (e.g. Boards) opt out so an
+        // auto-reload never interrupts drag-and-drop or in-place editing.
+        if (window.__ceoNoAutoReload) return;
         if (document.visibilityState !== 'visible') return;
         var el = document.activeElement;
         if (el && ['INPUT', 'SELECT', 'TEXTAREA'].includes(el.tagName)) return;
