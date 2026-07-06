@@ -94,11 +94,15 @@
 </div></div>
 
 @include('boards.partials.card-modal')
+@endsection
 
+@push('scripts')
+{{-- Pushed so these run AFTER the layout's Bootstrap/SortableJS at the end of
+     the body — boards.js relies on `bootstrap` and the DOM being ready. --}}
 <script>
     window.__ceoNoAutoReload = true;
     window.__BOARD = @json($boardData);
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" crossorigin="anonymous"></script>
-<script src="{{ asset('js/boards.js') }}?v=1"></script>
-@endsection
+<script src="{{ asset('js/boards.js') }}?v=2"></script>
+@endpush

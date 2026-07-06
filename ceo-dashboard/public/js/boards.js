@@ -211,7 +211,10 @@
     }
 
     // ---- card modal --------------------------------------------------------
-    var cardModal = new bootstrap.Modal('#cardModal');
+    // Instantiated lazily so board rendering never depends on Bootstrap having
+    // loaded yet (defensive — scripts are also pushed after the Bootstrap CDN).
+    var _cardModal;
+    function cardModalInstance() { return (_cardModal = _cardModal || new bootstrap.Modal('#cardModal')); }
     var current = null; // detail of the open card
 
     canvas.addEventListener('click', function (e) {
@@ -225,7 +228,7 @@
         api('GET', '/cards/' + id).then(function (d) {
             current = d.card;
             renderModal();
-            cardModal.show();
+            cardModalInstance().show();
         }).catch(toast);
     }
 
@@ -443,7 +446,7 @@
             var listId = tile ? +tile.closest('.list-col').dataset.listId : null;
             if (tile) tile.remove();
             if (listId) bumpCount(listId);
-            cardModal.hide();
+            cardModalInstance().hide();
         }).catch(toast);
     });
 
