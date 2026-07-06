@@ -47,11 +47,12 @@ class CardController extends Controller
         $validated = $request->validate([
             'title'       => ['sometimes', 'string', 'max:500'],
             'description' => ['sometimes', 'nullable', 'string', 'max:20000'],
+            'start_date'  => ['sometimes', 'nullable', 'date'],
             'due_date'    => ['sometimes', 'nullable', 'date'],
             'completed'   => ['sometimes', 'boolean'],
         ]);
 
-        $update = array_intersect_key($validated, array_flip(['title', 'description', 'due_date']));
+        $update = array_intersect_key($validated, array_flip(['title', 'description', 'start_date', 'due_date']));
 
         if ($request->has('completed')) {
             $update['completed_at'] = $request->boolean('completed') ? now() : null;
@@ -65,6 +66,7 @@ class CardController extends Controller
     public function destroy(Card $card)
     {
         $this->cardWorkspace($card);
+        \App\Models\CardAttachment::purgeForCards([$card->id]);
         $card->delete();
 
         return response()->json(['ok' => true]);
@@ -126,12 +128,10 @@ class CardController extends Controller
 
     public function toggleMember(Request $request, Card $card)
     {
-        $workspace = $this->cardWorkspace($card);
+        // The acting user must have board access; the assignee can be any user.
+        $this->cardWorkspace($card);
 
-        $userId = $request->validate(['user_id' => ['required', 'integer']])['user_id'];
-
-        // Assignee must be a member of the owning workspace.
-        abort_unless($workspace->members()->whereKey($userId)->exists(), 422, 'Not a workspace member.');
+        $userId = $request->validate(['user_id' => ['required', 'integer', 'exists:users,id']])['user_id'];
 
         $card->members()->toggle($userId);
 

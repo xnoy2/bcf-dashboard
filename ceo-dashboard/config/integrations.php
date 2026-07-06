@@ -54,6 +54,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Board card attachments
+    |--------------------------------------------------------------------------
+    | Storage disk for card attachments. 'boards' = local disk (needs a Railway
+    | volume). 'r2' = Cloudflare R2 (S3) with presigned direct upload/download,
+    | which supports big files without a volume. Max upload size in MB.
+    */
+    'attachments' => [
+        'disk'      => env('ATTACHMENTS_DISK', 'boards'),
+        'max_mb'    => (int) env('ATTACHMENTS_MAX_MB', 500),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | GoHighLevel
     |--------------------------------------------------------------------------
     */

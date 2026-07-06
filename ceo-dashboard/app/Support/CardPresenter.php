@@ -23,6 +23,7 @@ class CardPresenter
             'list_id'     => $card->board_list_id,
             'title'       => $card->title,
             'position'    => $card->position,
+            'completed'   => (bool) $card->completed_at,
             'has_description' => filled($card->description),
             'due'         => self::due($card),
             'labels'      => $card->labels->map(fn ($l) => [
@@ -49,6 +50,7 @@ class CardPresenter
 
         return array_merge(self::summary($card), [
             'description' => $card->description,
+            'start'       => $card->start_date?->toDateString(),
             'board_id'    => $board->id,
             'list_name'   => $card->list->name,
             'checklists'  => $card->checklists->map(fn ($cl) => [
@@ -80,12 +82,13 @@ class CardPresenter
                 'name'  => $a->original_name,
                 'url'   => route('boards.attachments.show', $a),
                 'image' => $a->isImage(),
+                'size'  => (int) $a->size,
             ])->values(),
-            // Pickers: everything available on this board.
+            // Pickers: labels are board-scoped; members can be any dashboard user.
             'board_labels'  => $board->labels->map(fn ($l) => [
                 'id' => $l->id, 'name' => $l->name, 'color' => $l->color,
             ])->values(),
-            'board_members' => $board->workspace->members->map(fn ($u) => self::person($u))->values(),
+            'board_members' => User::orderBy('name')->get()->map(fn ($u) => self::person($u))->values(),
         ]);
     }
 

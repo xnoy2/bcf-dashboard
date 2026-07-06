@@ -32,12 +32,13 @@ class BoardsTest extends TestCase
         $ws = Workspace::first();
         $this->assertTrue($ws->hasMember($user));
 
-        // Board is seeded with the three default lists.
+        // A new board starts empty — no lists.
         $this->post("/workspaces/{$ws->id}/boards", ['name' => 'Portals'])->assertRedirect();
         $board = Board::first();
-        $this->assertSame(3, $board->lists()->count());
+        $this->assertSame(0, $board->lists()->count());
 
-        // Add a card to the first list.
+        // Add a list, then a card to it.
+        $this->postJson("/boards/{$board->id}/lists", ['name' => 'To Do'])->assertOk();
         $list = $board->lists()->orderBy('position')->first();
         $res = $this->postJson("/lists/{$list->id}/cards", ['title' => 'Ship it']);
         $res->assertOk()->assertJsonPath('card.title', 'Ship it');
@@ -66,6 +67,26 @@ class BoardsTest extends TestCase
         $this->assertSame(1, $c1->fresh()->position);
         // A "moved" activity was recorded.
         $this->assertDatabaseHas('card_activities', ['card_id' => $c1->id, 'action' => 'moved']);
+    }
+
+    public function test_list_can_be_duplicated_with_its_cards(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+        $ws = $this->workspaceFor($user);
+        $board = $ws->boards()->create(['name' => 'B', 'position' => 0]);
+        $list = $board->lists()->create(['name' => 'Original', 'position' => 0]);
+        $list->cards()->create(['title' => 'c1', 'position' => 0]);
+        $list->cards()->create(['title' => 'c2', 'position' => 1]);
+
+        $res = $this->postJson("/lists/{$list->id}/duplicate")->assertOk();
+        $res->assertJsonPath('list.name', 'Original (copy)');
+
+        $this->assertSame(2, $board->lists()->count());
+        $copy = $board->lists()->where('name', 'Original (copy)')->first();
+        $this->assertSame(2, $copy->cards()->count());
+        // The copy sits directly after the original.
+        $this->assertSame($list->position + 1, $copy->position);
     }
 
     public function test_non_member_cannot_access_or_mutate_another_board(): void

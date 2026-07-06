@@ -1,8 +1,11 @@
 {{-- Card detail modal. All content is populated by boards.js from GET /cards/{id}. --}}
 <div class="modal fade" id="cardModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header align-items-start">
+                <button type="button" id="cmComplete" class="cm-complete" title="Mark complete" aria-label="Mark complete">
+                    <i class="bi bi-circle"></i>
+                </button>
                 <div class="flex-grow-1 me-2">
                     <h5 class="modal-title" id="cmTitle" contenteditable="true"
                         spellcheck="false" style="border-radius:6px;padding:.1rem .3rem;"></h5>
@@ -24,18 +27,7 @@
                         <button class="btn btn-sm btn-light" data-bs-toggle="dropdown" data-bs-auto-close="outside">
                             <i class="bi bi-clock"></i> Dates
                         </button>
-                        <div class="dropdown-menu p-3" style="min-width:260px;" id="cmDateMenu">
-                            <label class="form-label small">Due date</label>
-                            <input type="datetime-local" id="cmDueInput" class="form-control form-control-sm mb-2">
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="cmCompleted">
-                                <label class="form-check-label small" for="cmCompleted">Mark complete</label>
-                            </div>
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-sm btn-primary" id="cmSaveDue">Save</button>
-                                <button class="btn btn-sm btn-outline-secondary" id="cmClearDue">Remove</button>
-                            </div>
-                        </div>
+                        <div class="dropdown-menu p-3" id="cmDateMenu"><!-- calendar rendered by boards.js --></div>
                     </div>
                     <div class="dropdown">
                         <button class="btn btn-sm btn-light" data-bs-toggle="dropdown" data-bs-auto-close="outside">
@@ -43,9 +35,18 @@
                         </button>
                         <div class="dropdown-menu p-2" style="min-width:230px;" id="cmMemberMenu"></div>
                     </div>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-light" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                            <i class="bi bi-check2-square"></i> Checklist
+                        </button>
+                        <div class="dropdown-menu p-3" style="min-width:250px;" id="cmChecklistMenu">
+                            <label class="form-label small mb-1">Checklist title</label>
+                            <input type="text" class="form-control form-control-sm mb-2" id="cmChecklistTitle" placeholder="Checklist" value="Checklist">
+                            <button type="button" class="btn btn-primary btn-sm" id="cmAddChecklistBtn">Add</button>
+                        </div>
+                    </div>
                     <button class="btn btn-sm btn-light" id="cmAttachBtn"><i class="bi bi-paperclip"></i> Attachment</button>
-                    <input type="file" id="cmFileInput" multiple hidden
-                           accept=".jpg,.jpeg,.png,.gif,.webp,.heic,.heif,.pdf,.doc,.docx,.xls,.xlsx,.txt,.csv">
+                    <input type="file" id="cmFileInput" multiple hidden>
                 </div>
 
                 <div class="cm-grid">
@@ -55,21 +56,19 @@
                         <div id="cmDueRow" class="mb-2"></div>
 
                         <div class="cm-section-title"><i class="bi bi-text-left"></i> Description</div>
-                        <textarea id="cmDescription" class="form-control" rows="3"
+                        <div id="cmDescDisplay" class="cm-desc-display" title="Click to edit"></div>
+                        <textarea id="cmDescription" class="form-control d-none" rows="3"
                                   placeholder="Add a more detailed description…"></textarea>
-                        <div class="mt-1">
-                            <button id="cmSaveDesc" class="btn btn-sm btn-primary d-none">Save</button>
-                            <button id="cmCancelDesc" class="btn btn-sm btn-light d-none">Cancel</button>
+                        <div class="mt-1 d-none" id="cmDescEditBtns">
+                            <button id="cmSaveDesc" class="btn btn-sm btn-primary">Save</button>
+                            <button id="cmCancelDesc" class="btn btn-sm btn-light">Cancel</button>
                         </div>
 
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div class="cm-section-title"><i class="bi bi-check2-square"></i> Checklist</div>
-                            <button id="cmAddChecklist" class="btn btn-sm btn-link text-decoration-none">+ Add checklist</button>
-                        </div>
                         <div id="cmChecklists"></div>
 
                         <div class="cm-section-title"><i class="bi bi-paperclip"></i> Attachments</div>
-                        <div id="cmAttachments" class="d-flex flex-wrap gap-2"></div>
+                        <div id="cmUploadProgress" class="up-wrap d-none"></div>
+                        <div id="cmAttachments" class="att-list"></div>
                     </div>
 
                     {{-- Right column: comments & activity --}}

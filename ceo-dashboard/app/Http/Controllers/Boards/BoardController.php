@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Boards;
 
 use App\Http\Controllers\Controller;
 use App\Models\Board;
+use App\Models\Card;
+use App\Models\CardAttachment;
 use App\Models\Workspace;
 use App\Support\CardPresenter;
 use Illuminate\Http\Request;
@@ -11,9 +13,6 @@ use Illuminate\Http\Request;
 class BoardController extends Controller
 {
     use AuthorizesWorkspace;
-
-    /** Lists seeded on a new board so it's usable immediately. */
-    private const DEFAULT_LISTS = ['Not Started', 'In-Progress', 'Completed'];
 
     public function store(Request $request, Workspace $workspace)
     {
@@ -24,16 +23,13 @@ class BoardController extends Controller
             'color' => ['nullable', 'string', 'max:9'],
         ]);
 
+        // New boards start empty — the user adds their own lists.
         $board = $workspace->boards()->create([
             'name'       => $data['name'],
             'color'      => $data['color'] ?? '#2563EB',
             'position'   => (int) $workspace->boards()->max('position') + 1,
             'created_by' => $request->user()->id,
         ]);
-
-        foreach (self::DEFAULT_LISTS as $i => $name) {
-            $board->lists()->create(['name' => $name, 'position' => $i]);
-        }
 
         return redirect()->route('boards.show', $board);
     }
@@ -80,6 +76,9 @@ class BoardController extends Controller
     public function destroy(Request $request, Board $board)
     {
         $workspace = $this->boardWorkspace($board);
+        CardAttachment::purgeForCards(
+            Card::whereIn('board_list_id', $board->lists()->pluck('id'))->pluck('id')
+        );
         $board->delete();
 
         return redirect()->route('workspaces.index', ['workspace' => $workspace->id])

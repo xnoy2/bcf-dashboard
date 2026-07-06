@@ -63,6 +63,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/boards/{board}/lists', [BoardListController::class, 'store'])->name('lists.store');
     Route::post('/boards/{board}/lists/reorder', [BoardListController::class, 'reorder'])->name('lists.reorder');
     Route::patch('/lists/{list}', [BoardListController::class, 'update'])->name('lists.update');
+    Route::post('/lists/{list}/duplicate', [BoardListController::class, 'duplicate'])->name('lists.duplicate');
     Route::delete('/lists/{list}', [BoardListController::class, 'destroy'])->name('lists.destroy');
 
     Route::post('/lists/{list}/cards', [CardController::class, 'store'])->name('cards.store');
@@ -87,6 +88,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/comments/{comment}', [CardCommentController::class, 'destroy'])->name('comments.destroy');
 
     Route::post('/cards/{card}/attachments', [CardAttachmentController::class, 'store'])->name('attachments.store');
+    Route::post('/cards/{card}/attachments/presign', [CardAttachmentController::class, 'presign'])->name('attachments.presign');
+    Route::post('/cards/{card}/attachments/record', [CardAttachmentController::class, 'record'])->name('attachments.record');
     Route::get('/card-attachments/{attachment}', [CardAttachmentController::class, 'show'])->name('boards.attachments.show');
     Route::delete('/card-attachments/{attachment}', [CardAttachmentController::class, 'destroy'])->name('attachments.destroy');
 

@@ -12,10 +12,11 @@ class Card extends Model
 {
     protected $fillable = [
         'board_list_id', 'title', 'description', 'position',
-        'due_date', 'completed_at', 'created_by',
+        'start_date', 'due_date', 'completed_at', 'created_by',
     ];
 
     protected $casts = [
+        'start_date'   => 'datetime',
         'due_date'     => 'datetime',
         'completed_at' => 'datetime',
     ];

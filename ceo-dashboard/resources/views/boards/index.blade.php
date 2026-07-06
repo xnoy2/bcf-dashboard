@@ -17,6 +17,9 @@
     .wsp-item { display: flex; align-items: center; gap: .6rem; padding: .5rem; border-radius: 10px; color: inherit; text-decoration: none; font-weight: 600; }
     .wsp-item:hover { background: var(--bs-tertiary-bg); color: inherit; }
     .wsp-item.active { background: rgba(200,162,75,.14); color: var(--ceo-aubergine); }
+    .wsp-name { flex: 1 1 auto; min-width: 0; }
+    .wsp-shared { flex: 0 0 auto; display: inline-flex; align-items: center; gap: .2rem; font-size: .6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; color: var(--bs-secondary-color); background: var(--bs-tertiary-bg); border: 1px solid var(--ceo-border); padding: .08rem .4rem; border-radius: 20px; }
+    .wsp-item.active .wsp-shared { background: var(--bs-body-bg); }
     html[data-theme="dark"] .wsp-item.active { color: var(--ceo-gold); }
     .wsp-badge, .board-badge { flex: 0 0 auto; width: 34px; height: 34px; border-radius: 8px; color: #fff; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
     .btn-add-wsp { width: 100%; margin-top: .5rem; border: 1px dashed var(--ceo-border); background: transparent; color: var(--bs-secondary-color); border-radius: 10px; padding: .55rem; font-weight: 600; }
@@ -60,6 +63,9 @@
                            class="wsp-item {{ $current && $current->id === $ws->id ? 'active' : '' }}">
                             <span class="wsp-badge" style="background: {{ $ws->color }}">{{ mb_strtoupper(mb_substr($ws->name, 0, 1)) }}</span>
                             <span class="wsp-name text-truncate">{{ $ws->name }}</span>
+                            @unless($ws->owner_id === auth()->id())
+                                <span class="wsp-shared" title="Shared with you by the owner"><i class="bi bi-people-fill"></i> Shared</span>
+                            @endunless
                         </a>
                     </li>
                 @empty
@@ -120,7 +126,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
         <div class="modal-body">
             <label class="form-label">Name</label>
-            <input name="name" class="form-control" maxlength="255" required autofocus placeholder="e.g. IT/Dev">
+            <input name="name" class="form-control" maxlength="255" required autofocus placeholder="Enter workspace name..">
             <label class="form-label mt-3">Colour</label>
             @include('boards.partials.swatches', ['field' => 'color', 'palette' => $palette, 'selected' => $palette[1]])
         </div>
@@ -140,10 +146,9 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
             <div class="modal-body">
                 <label class="form-label">Board name</label>
-                <input name="name" class="form-control" maxlength="255" required placeholder="e.g. Portals / System">
+                <input name="name" class="form-control" maxlength="255" required placeholder="Enter board name..">
                 <label class="form-label mt-3">Colour</label>
                 @include('boards.partials.swatches', ['field' => 'color', 'palette' => $palette, 'selected' => $palette[0]])
-                <p class="text-muted small mt-3 mb-0">Starts with <strong>Not Started</strong>, <strong>In-Progress</strong> and <strong>Completed</strong> lists.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
@@ -179,3 +184,8 @@
     </div></div></div>
 @endif
 @endsection
+
+@push('scripts')
+{{-- Don't auto-reload the page while a create/settings modal may be open. --}}
+<script>window.__ceoNoAutoReload = true;</script>
+@endpush

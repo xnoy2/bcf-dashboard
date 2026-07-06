@@ -43,7 +43,8 @@ class Workspace extends Model
     /** Workspaces the user owns or belongs to. */
     public function scopeAccessibleBy(Builder $query, User $user): Builder
     {
-        return $query->where('owner_id', $user->id)
-            ->orWhereHas('members', fn ($q) => $q->whereKey($user->id));
+        return $query->where(fn ($q) => $q
+            ->where('owner_id', $user->id)
+            ->orWhereHas('members', fn ($m) => $m->whereKey($user->id)));
     }
 }

@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Boards;
 
 use App\Http\Controllers\Controller;
+use App\Models\BoardList;
+use App\Models\Card;
+use App\Models\CardAttachment;
 use App\Models\Workspace;
 use Illuminate\Http\Request;
 
@@ -71,6 +74,9 @@ class WorkspaceController extends Controller
     public function destroy(Request $request, Workspace $workspace)
     {
         $this->guardOwner($workspace);
+
+        $listIds = BoardList::whereIn('board_id', $workspace->boards()->pluck('id'))->pluck('id');
+        CardAttachment::purgeForCards(Card::whereIn('board_list_id', $listIds)->pluck('id'));
         $workspace->delete();
 
         return redirect()->route('workspaces.index')->with('refreshed', 'Workspace deleted.');
