@@ -39,6 +39,14 @@ return [
             'throw' => false,
         ],
 
+        // Board card attachments — served via an auth-checked controller route.
+        // On Railway, mount a persistent volume at /app/storage/app/boards.
+        'boards' => [
+            'driver' => 'local',
+            'root' => storage_path('app/boards'),
+            'throw' => false,
+        ],
+
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
