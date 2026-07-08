@@ -98,6 +98,63 @@
                 </table>
             </div>
         </div>
+
+        {{-- Funnels — monitor newly created / updated funnels across accounts --}}
+        @php $funnelAccounts = collect($funnels)->pluck('account')->unique()->sort()->values(); @endphp
+        <div class="card mt-3" id="funnelsCard">
+            <div class="card-header d-flex align-items-center flex-wrap gap-2">
+                <h3 class="card-title mb-0">Funnels <small class="text-muted" id="funnelCount">({{ count($funnels) }})</small></h3>
+                <span class="text-muted small d-none d-lg-inline">newest first</span>
+                <div class="ms-auto d-flex align-items-center gap-2">
+                    @if($account === 'all' && $funnelAccounts->count() > 1)
+                        <select id="funnelAccount" class="form-select form-select-sm" style="width:190px">
+                            <option value="">All accounts</option>
+                            @foreach($funnelAccounts as $acc)
+                                <option value="{{ $acc }}">{{ $accounts[strtolower($acc)]['name'] ?? $acc }}</option>
+                            @endforeach
+                        </select>
+                    @endif
+                    <input type="search" id="funnelSearch" class="form-control form-control-sm" placeholder="Filter funnels…" style="width:200px">
+                </div>
+            </div>
+            <div class="card-body p-0" style="max-height:60vh; overflow:auto;">
+                <table class="table table-striped table-hover mb-0" id="funnelTable">
+                    <thead class="sticky-top bg-body">
+                        <tr>
+                            <th>Funnel</th>
+                            <th>Account</th>
+                            <th>Created</th>
+                            <th>Created By</th>
+                            <th>Last Updated</th>
+                            <th class="text-end">Steps</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($funnels as $f)
+                            <tr data-account="{{ $f['account'] }}">
+                                <td>{{ $f['name'] }}</td>
+                                <td><span class="badge text-bg-light">{{ $f['account'] }}</span></td>
+                                <td>{{ $f['created_label'] }}</td>
+                                <td>
+                                    @if($f['created_by'])
+                                        <span class="text-truncate d-inline-block" style="max-width:230px" title="{{ $f['created_by'] }}">{{ $f['created_by'] }}</span>
+                                    @else
+                                        <span class="text-muted">—</span>
+                                    @endif
+                                </td>
+                                <td>{{ $f['updated_label'] }}</td>
+                                <td class="text-end">{{ $f['steps'] ?? '—' }}</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="6" class="text-center text-muted py-3">No funnels found for this account.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer small text-muted d-flex justify-content-end">
+                @include('partials.card-link', ['tool' => 'ghl', 'text' => 'Open in GoHighLevel'])
+            </div>
+        </div>
     </div>
 </div>
 @endsection
@@ -181,5 +238,24 @@
         }
     });
     applyFilters();
+
+    // Funnels table — filter by search text and (in the All Accounts view) business.
+    const funnelSearch = document.getElementById('funnelSearch');
+    const funnelAccount = document.getElementById('funnelAccount');
+    function filterFunnels() {
+        const q = (funnelSearch?.value || '').toLowerCase();
+        const acc = funnelAccount?.value || '';
+        const rows = document.querySelectorAll('#funnelTable tbody tr[data-account]');
+        let shown = 0;
+        rows.forEach(tr => {
+            const visible = tr.textContent.toLowerCase().includes(q) && (!acc || tr.dataset.account === acc);
+            tr.style.display = visible ? '' : 'none';
+            if (visible) shown++;
+        });
+        const countEl = document.getElementById('funnelCount');
+        if (countEl) countEl.textContent = (shown === rows.length) ? '(' + rows.length + ')' : '(' + shown + ' of ' + rows.length + ')';
+    }
+    funnelSearch?.addEventListener('input', filterFunnels);
+    funnelAccount?.addEventListener('change', filterFunnels);
 </script>
 @endpush

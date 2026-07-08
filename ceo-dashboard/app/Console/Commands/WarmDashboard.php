@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Services\Cloudflare\SecurityService;
 use App\Services\Ghl\AppointmentsService;
 use App\Services\Ghl\FinanceService;
+use App\Services\Ghl\FunnelsService;
 use App\Services\Ghl\GhlService;
 use App\Services\GoDaddy\GoDaddyService;
 use App\Services\Portals\ClientProjectsService;
@@ -29,6 +30,7 @@ class WarmDashboard extends Command
         ClientProjectsService $clientProjects,
         OperationsService $operations,
         GoDaddyService $godaddy,
+        FunnelsService $funnels,
     ): int {
         // Force every service to fetch fresh and overwrite its snapshot.
         Snapshot::forceRefresh();
@@ -45,6 +47,9 @@ class WarmDashboard extends Command
 
             $this->line("Appointments: $account");
             $appointments->summary($account);
+
+            $this->line("Funnels:      $account");
+            $funnels->summary($account);
         }
 
         $this->line('Security (Cloudflare)…');
