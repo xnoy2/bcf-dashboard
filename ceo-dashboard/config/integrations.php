@@ -88,6 +88,7 @@ return [
         // Draft apps authorise by version_id (not client_id). Falls back to the
         // app id embedded in the client id (the part before the "-").
         'version_id'    => env('GHL_VERSION_ID'),
+        'redirect_uri'  => env('GHL_REDIRECT_URI'), // explicit full URL (recommended in prod)
         'redirect_path' => env('GHL_REDIRECT_PATH', '/integrations/crm/callback'),
         'authorize_url' => 'https://marketplace.gohighlevel.com/oauth/chooselocation',
         'scopes'        => 'contacts.readonly opportunities.readonly locations.readonly '

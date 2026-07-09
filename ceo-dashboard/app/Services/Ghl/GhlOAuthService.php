@@ -44,7 +44,9 @@ class GhlOAuthService
     /** Full redirect URI — must exactly match one registered in the GHL app. */
     public function redirectUri(): string
     {
-        return url($this->cfg('redirect_path'));
+        // Prefer an explicit full URL (avoids APP_URL / proxy-host mismatches);
+        // fall back to building it from the current host + path.
+        return $this->cfg('redirect_uri') ?: url($this->cfg('redirect_path'));
     }
 
     /** The app version id (Draft apps authorise by version_id, not client_id). */
