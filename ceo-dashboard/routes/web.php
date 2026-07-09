@@ -15,6 +15,7 @@ use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ClientProjectsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FinanceController;
+use App\Http\Controllers\IntegrationsController;
 use App\Http\Controllers\MarketingController;
 use App\Http\Controllers\OperationsController;
 use App\Http\Controllers\RefreshController;
@@ -44,6 +45,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/security', [SecurityController::class, 'index'])->name('security');
     Route::get('/renewals', [RenewalsController::class, 'index'])->name('renewals');
     Route::post('/refresh-data', RefreshController::class)->name('refresh-data');
+
+    // --- Integrations (GoHighLevel agency OAuth) ---
+    Route::get('/integrations', [IntegrationsController::class, 'index'])->name('integrations.index');
+    Route::get('/integrations/crm/connect', [IntegrationsController::class, 'connect'])->name('integrations.connect');
+    Route::get('/integrations/crm/callback', [IntegrationsController::class, 'callback'])->name('integrations.callback');
+    Route::post('/integrations/crm/sync', [IntegrationsController::class, 'sync'])->name('integrations.sync');
+    Route::post('/integrations/crm/disconnect', [IntegrationsController::class, 'disconnect'])->name('integrations.disconnect');
 
     // --- Boards (Trello-style workspaces / boards / lists / cards) ---
     Route::get('/boards', [WorkspaceController::class, 'index'])->name('workspaces.index');

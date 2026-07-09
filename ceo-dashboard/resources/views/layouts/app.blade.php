@@ -189,6 +189,11 @@
                             <p>Renewals @if($renewUrgent)<span class="badge text-bg-danger ms-1">{{ $renewUrgent }}</span>@endif</p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{{ route('integrations.index') }}" class="nav-link {{ request()->routeIs('integrations.*') ? 'active' : '' }}">
+                            <i class="nav-icon bi bi-diagram-3"></i><p>Integrations</p>
+                        </a>
+                    </li>
 
                     {{-- Logout pinned to the bottom of the sidebar --}}
                     <li class="nav-item mt-3 pt-2 border-top border-secondary border-opacity-25">

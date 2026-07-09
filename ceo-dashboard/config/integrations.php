@@ -77,6 +77,27 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | GoHighLevel Agency OAuth app (multi-sub-account integration)
+    |--------------------------------------------------------------------------
+    | One agency install → access to every sub-account. The agency token is
+    | exchanged/refreshed here; per-location tokens are minted on demand.
+    */
+    'ghl_oauth' => [
+        'client_id'     => env('GHL_CLIENT_ID'),
+        'client_secret' => env('GHL_CLIENT_SECRET'),
+        // Draft apps authorise by version_id (not client_id). Falls back to the
+        // app id embedded in the client id (the part before the "-").
+        'version_id'    => env('GHL_VERSION_ID'),
+        'redirect_path' => env('GHL_REDIRECT_PATH', '/integrations/crm/callback'),
+        'authorize_url' => 'https://marketplace.gohighlevel.com/oauth/chooselocation',
+        'scopes'        => 'contacts.readonly opportunities.readonly locations.readonly '
+            . 'calendars.readonly calendars/events.readonly '
+            . 'funnels/funnel.readonly funnels/page.readonly funnels/redirect.readonly funnels/pagecount.readonly '
+            . 'payments/transactions.readonly payments/orders.readonly users.readonly',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Live portals (REST) — validated live 2026-06-08
     |--------------------------------------------------------------------------
     */
